@@ -1,0 +1,55 @@
+.card {
+	background-color: light-dark(
+		var(--mantine-color-white),
+		var(--mantine-color-dark-7)
+	);
+
+	width: 360px;
+}
+
+.section {
+	border-bottom: 1px solid
+		light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+	padding-left: var(--mantine-spacing-md);
+	padding-right: var(--mantine-spacing-md);
+	padding-bottom: var(--mantine-spacing-md);
+}
+
+.like,
+.bookmark,
+.share {
+	width: 20px;
+	height: 20px;
+}
+
+.like {
+	color: var(--mantine-color-red-6);
+}
+
+.bookmark {
+	color: var(--mantine-color-yellow-4);
+}
+
+.label {
+	text-transform: uppercase;
+	font-size: var(--mantine-font-size-xs);
+	font-weight: 700;
+}
+
+.user {
+	flex: 1;
+}
+
+.user:hover {
+	text-decoration: underline;
+}
+
+@media (max-width: $mantine-breakpoint-xs) {
+	.card {
+		width: 300px;
+	}
+
+	.user_name {
+		display: none;
+	}
+}

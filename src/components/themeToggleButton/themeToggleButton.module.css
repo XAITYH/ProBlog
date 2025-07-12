@@ -1,0 +1,29 @@
+.action_icon {
+	width: calc(2.25rem * var(--mantine-scale));
+	height: calc(2.25rem * var(--mantine-scale));
+}
+
+.icon {
+	width: 22px;
+	height: 22px;
+}
+
+.dark {
+	@mixin dark {
+		display: none;
+	}
+
+	@mixin light {
+		display: block;
+	}
+}
+
+.light {
+	@mixin light {
+		display: none;
+	}
+
+	@mixin dark {
+		display: block;
+	}
+}
