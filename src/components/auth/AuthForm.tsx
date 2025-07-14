@@ -64,11 +64,15 @@ export function AuthForm({ type }: { type: 'login' | 'register' }) {
 		validate: {
 			email: value => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
 			password: value => {
-				if (value.length < 6)
-					return 'Password must be at least 6 characters';
-				const strength = getStrength(value);
-				if (strength < 50) return 'Password is too weak';
-				return null;
+				if (type === 'register') {
+					if (value.length < 6)
+						return 'Password must be at least 6 characters';
+					const strength = getStrength(value);
+					if (strength < 50) return 'Password is too weak';
+					return null;
+				} else {
+					return null;
+				}
 			},
 			confirmPassword: (value, values) =>
 				value !== values.password ? 'Passwords do not match' : null
@@ -133,15 +137,19 @@ export function AuthForm({ type }: { type: 'login' | 'register' }) {
 				{...form.getInputProps('password')}
 			/>
 
-			<Group gap={5} grow mt='xs' mb='md'>
-				{bars}
-			</Group>
+			{type === 'register' && (
+				<>
+					<Group gap={5} grow mt='xs' mb='md'>
+						{bars}
+					</Group>
 
-			<PasswordRequirement
-				label='Has at least 6 characters'
-				meets={form.values.password.length > 5}
-			/>
-			{checks}
+					<PasswordRequirement
+						label='Has at least 6 characters'
+						meets={form.values.password.length > 5}
+					/>
+					{checks}
+				</>
+			)}
 
 			{type === 'register' && (
 				<PasswordInput

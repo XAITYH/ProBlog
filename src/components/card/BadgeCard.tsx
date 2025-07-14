@@ -18,26 +18,20 @@ import {
 	Text,
 	UnstyledButton
 } from '@mantine/core';
-import classes from './badgeCard.module.css';
-import { user } from '@/constants/header.constants';
+import { user } from '@/shared/constants/user.constants';
 import { useState } from 'react';
+import { Post } from '@/shared/types/post.types';
+import posts from '@/data/posts.json';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
+import { Zoom } from 'yet-another-react-lightbox/plugins';
 
-const mockdata = {
-	image: user.image,
-	title: 'CATMINT',
-	extra: 'trending',
-	description: 'This thing is awesome.',
-	badges: [
-		{ emoji: '☀️', label: 'Sunny everywhere' },
-		{ emoji: '🦓', label: 'Friends' },
-		{ emoji: '🌲', label: 'Nature' },
-		{ emoji: '😍', label: 'CATMINT' }
-	]
-};
+import classes from './badgeCard.module.css';
 
 const BadgeCard = () => {
-	const [favorite, setFavorite] = useState(false);
-	const [inCollection, setInCollection] = useState(false);
+	const [favorite, setFavorite] = useState<boolean>(false);
+	const [inCollection, setInCollection] = useState<boolean>(false);
+	const [opened, setOpened] = useState<number | null>(null);
 
 	const handleAddToFavorites = () => {
 		setFavorite(!favorite);
@@ -47,114 +41,148 @@ const BadgeCard = () => {
 		setInCollection(!inCollection);
 	};
 
-	const { image, title, description, extra, badges } = mockdata;
-	const features = badges.map(badge => (
-		<Badge variant='light' key={badge.label} leftSection={badge.emoji}>
-			{badge.label}
-		</Badge>
-	));
-
 	return (
-		<Card withBorder radius='md' p='md' className={classes.card}>
-			<Card.Section>
-				<Image
-					src={image}
-					alt={title}
-					h={340}
-					style={{ objectFit: 'contain' }}
-				/>
-			</Card.Section>
-
-			<Card.Section className={classes.section} mt='md'>
-				<Group justify='apart'>
-					<Text fz='lg' fw={500}>
-						{title}
-					</Text>
-					<Badge
-						size='sm'
-						variant='gradient'
-						gradient={{ from: 'pink', to: 'orange', deg: 90 }}
-					>
-						{extra}
-					</Badge>
-				</Group>
-				<Spoiler
-					maxHeight={60}
-					showLabel='Show more'
-					hideLabel='Show less'
+		<>
+			{posts.map((post: Post) => (
+				<Card
+					withBorder
+					radius='md'
+					p='md'
+					className={classes.card}
+					key={post.id}
 				>
-					<Text fz='sm' mt='xs'>
-						{description}pekg rgbkpo sertrpkgh efl rkgoper tjrfj
-						e5kdtn ,mtydm bvn ktykmth rena sehnplop aerporkgh Lorem
-						ipsum dolor sit amet consectetur adipisicing elit.
-						Error, enim ullam. Optio dolorum quidem numquam illum
-						pariatur a quae voluptatem voluptatibus consequuntur
-						aliquid, dolor alias iste repellendus architecto
-						repellat nemo.
-					</Text>
-				</Spoiler>
-			</Card.Section>
+					{post.images.length > 0 && (
+						<>
+							<Card.Section>
+								<Image
+									key={post.id}
+									src={post.images[0]}
+									className={classes.image}
+									loading='lazy'
+									onClick={() => setOpened(post.id)}
+								/>
+							</Card.Section>
 
-			<Card.Section className={classes.section}>
-				<Text mt='md' className={classes.label} c='dimmed'>
-					Perfect for you, if you enjoy
-				</Text>
-				<Group gap={7} mt={5}>
-					{features}
-				</Group>
-			</Card.Section>
+							<Lightbox
+								open={post.id === opened}
+								close={() => setOpened(null)}
+								plugins={[Zoom]}
+								slides={post.images.map(image => ({
+									src: image
+								}))}
+								controller={{
+									disableSwipeNavigation:
+										post.images.length < 2
+								}}
+								render={
+									post.images.length < 2
+										? {
+												buttonNext: () => null,
+												buttonPrev: () => null
+										  }
+										: {}
+								}
+							/>
+						</>
+					)}
 
-			<Group mt='xs' align='center'>
-				<UnstyledButton className={classes.user}>
-					<Group gap={8} align='center'>
-						<Avatar src={user.image} radius='xl' />
+					<Card.Section
+						className={classes.section}
+						mt={post.images.length > 0 ? 'md' : 0}
+					>
+						<Group justify='apart'>
+							<Text fz='lg' fw={500}>
+								{post.title}
+							</Text>
 
-						<Text className={classes.user_name} size='sm' fw={500}>
-							{user.name}
-						</Text>
+							{post.extra && (
+								<Badge
+									size='sm'
+									variant='gradient'
+									gradient={{
+										from: 'pink',
+										to: 'orange',
+										deg: 90
+									}}
+								>
+									{post.extra}
+								</Badge>
+							)}
+						</Group>
+						<Spoiler
+							maxHeight={60}
+							showLabel='Show more'
+							hideLabel='Show less'
+						>
+							<Text fz='sm' mt='xs'>
+								{post.description}
+							</Text>
+						</Spoiler>
+					</Card.Section>
+
+					<Group mt='xs' align='center'>
+						<UnstyledButton className={classes.user}>
+							<Group gap={8} align='center'>
+								<Avatar src={user.image} radius='xl' />
+
+								<Text
+									className={classes.user_name}
+									size='sm'
+									fw={500}
+								>
+									{user.name}
+								</Text>
+							</Group>
+						</UnstyledButton>
+
+						<Group gap={10}>
+							<ActionIcon
+								variant='default'
+								radius='md'
+								size={36}
+								onClick={handleAddToFavorites}
+							>
+								{favorite ? (
+									<IconHeartFilled
+										className={classes.like}
+										stroke={1.5}
+									/>
+								) : (
+									<IconHeart
+										className={classes.like}
+										stroke={1.5}
+									/>
+								)}
+							</ActionIcon>
+							<ActionIcon
+								variant='default'
+								radius='md'
+								size={36}
+								onClick={handleAddToCollection}
+							>
+								{inCollection ? (
+									<IconBookmarkFilled
+										className={classes.bookmark}
+										stroke={1.5}
+									/>
+								) : (
+									<IconBookmark
+										className={classes.bookmark}
+										stroke={1.5}
+									/>
+								)}
+							</ActionIcon>
+							<ActionIcon variant='default' radius='md' size={36}>
+								<IconShare2
+									className={classes.share}
+									stroke={1.5}
+								/>
+							</ActionIcon>
+						</Group>
 					</Group>
-				</UnstyledButton>
-
-				<Group gap={10}>
-					<ActionIcon
-						variant='default'
-						radius='md'
-						size={36}
-						onClick={handleAddToFavorites}
-					>
-						{favorite ? (
-							<IconHeartFilled
-								className={classes.like}
-								stroke={1.5}
-							/>
-						) : (
-							<IconHeart className={classes.like} stroke={1.5} />
-						)}
-					</ActionIcon>
-					<ActionIcon
-						variant='default'
-						radius='md'
-						size={36}
-						onClick={handleAddToCollection}
-					>
-						{inCollection ? (
-							<IconBookmarkFilled
-								className={classes.bookmark}
-								stroke={1.5}
-							/>
-						) : (
-							<IconBookmark
-								className={classes.bookmark}
-								stroke={1.5}
-							/>
-						)}
-					</ActionIcon>
-					<ActionIcon variant='default' radius='md' size={36}>
-						<IconShare2 className={classes.share} stroke={1.5} />
-					</ActionIcon>
-				</Group>
-			</Group>
-		</Card>
+				</Card>
+			))}
+		</>
 	);
 };
 

@@ -1,9 +1,21 @@
 .header {
+	position: relative;
 	height: 60px;
 	padding-left: var(--mantine-spacing-md);
 	padding-right: var(--mantine-spacing-md);
+	color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
 	border-bottom: 1px solid
 		light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+}
+
+.header_hidden {
+	color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
+}
+
+.nav_links {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
 }
 
 .link {
@@ -13,7 +25,6 @@
 	padding-left: var(--mantine-spacing-md);
 	padding-right: var(--mantine-spacing-md);
 	text-decoration: none;
-	color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
 	font-weight: 500;
 	font-size: var(--mantine-font-size-sm);
 
@@ -28,6 +39,10 @@
 			var(--mantine-color-dark-6)
 		);
 	}
+}
+
+.active_link {
+	color: var(--mantine-color-gray-6);
 }
 
 .subLink {

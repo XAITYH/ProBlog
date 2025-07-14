@@ -1,8 +1,36 @@
 [
-  {
-    "id": 1,
-    "slug": "first-post",
-    "title": "Мой первый пост",
-    "content": "Текст..."
-  }
+	{
+		"id": 1,
+		"slug": "first-post",
+		"images": ["/snoopcat.jpg", "/snoopcat.jpg"],
+		"title": "CATMINT",
+		"extra": "Trending",
+		"description": "lorem ipsum pipsum merol muspi lorem ipsum lorem"
+	},
+	{
+		"id": 2,
+		"slug": "second-post",
+		"images": [
+			"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSguH4VFZ9f5cQ-mc1dqvYwVV7CWZoywcH9VQ&s"
+		],
+		"title": "My second post",
+		"extra": "New",
+		"description": "Text..."
+	},
+	{
+		"id": 3,
+		"slug": "third-post",
+		"images": [],
+		"title": "My third post",
+		"extra": "Popular",
+		"description": "Text..."
+	},
+	{
+		"id": 4,
+		"slug": "fourth-post",
+		"images": [],
+		"title": "My fourth post",
+		"extra": "",
+		"description": "Text..."
+	}
 ]

@@ -1,13 +1,7 @@
 import { IconCat, IconCode, IconNews, IconXd } from '@tabler/icons-react';
-import { IUser } from '@/shared/types/user.types';
+import { DropdownLink } from '../types/dropdownLink.constants';
 
-export const user: IUser = {
-	name: 'Boris Snoopcat',
-	email: 'boris@snoopcat.com',
-	image: '/snoopcat.jpg'
-};
-
-export const mockdata = [
+export const mockdata: DropdownLink[] = [
 	{
 		icon: IconCode,
 		title: 'Project',

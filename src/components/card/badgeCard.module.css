@@ -4,7 +4,36 @@
 		var(--mantine-color-dark-7)
 	);
 
-	width: 360px;
+	min-width: 360px;
+	max-width: 400px;
+}
+
+.image {
+	object-fit: contain;
+	cursor: pointer;
+}
+
+.carousel {
+	@mixin hover {
+		.carouselControls {
+			opacity: 1;
+		}
+	}
+}
+
+.carouselControls {
+	transition: opacity 150ms ease;
+	opacity: 0;
+}
+
+.carouselIndicator {
+	width: 4px;
+	height: 4px;
+	transition: width 250ms ease;
+
+	&[data-active] {
+		width: 16px;
+	}
 }
 
 .section {
@@ -38,15 +67,16 @@
 
 .user {
 	flex: 1;
-}
 
-.user:hover {
-	text-decoration: underline;
+	@mixin hover {
+		text-decoration: underline;
+	}
 }
 
 @media (max-width: $mantine-breakpoint-xs) {
 	.card {
-		width: 300px;
+		min-width: 280px;
+		max-width: 300px;
 	}
 
 	.user_name {
