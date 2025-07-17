@@ -1,10 +1,14 @@
 'use client';
 
-import classes from './page.module.css';
 import { useState } from 'react';
-import BadgeCards from '@/components/card/BadgeCards';
+
+import classes from './page.module.css';
+
+import CardsList from '@/components/cardsList/CardsList';
+
 import { FooterSocial } from '@/widgets/footer/FooterSocial';
 import { TopicControl } from '@/widgets/topicControl/TopicControl';
+
 import { TopicTypes } from '@/shared/types/topics.types';
 
 const Home = () => {
@@ -16,7 +20,7 @@ const Home = () => {
 				currentTopic={currentTopic}
 				setCurrentTopic={setCurrentTopic}
 			/>
-			<BadgeCards currentTopic={currentTopic} />
+			<CardsList currentTopic={currentTopic} />
 			<FooterSocial />
 		</div>
 	);

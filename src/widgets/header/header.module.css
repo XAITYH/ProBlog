@@ -13,6 +13,9 @@
 	border-bottom: 1px solid
 		light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
 	margin-bottom: 30px;
+
+	box-shadow: 0 0 15px
+		light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-6));
 }
 
 .header_hidden {

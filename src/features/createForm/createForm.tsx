@@ -84,7 +84,7 @@ const CreateForm = ({ topic }: Pick<DropdownLink, 'topic'>) => {
 						? error.message
 						: 'Failed to create post',
 				color: 'red',
-				autoClose: 3000
+				autoClose: 2500
 			});
 		}
 	}

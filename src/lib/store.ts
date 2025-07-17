@@ -14,6 +14,9 @@ type Store = {
 	updateUser: (userId: number, updates: Partial<UserType>) => void;
 	deleteUser: (userId: number) => void;
 
+	likePost: (postId: number) => void;
+	addToCollection: (postId: number) => void;
+
 	createPost: (post: Omit<PostType, 'id'>) => void;
 	updatePost: (postId: number, updates: Partial<PostType>) => void;
 	deletePost: (userId: number) => void;
@@ -48,6 +51,46 @@ export const useStore = create<Store>(set => ({
 		set(state => ({
 			users: state.users.filter(user => user.id !== userId)
 		})),
+
+	likePost: postId =>
+		set(state => {
+			if (!state.currentUser) return state;
+
+			const isLiked = state.currentUser.likedPosts?.includes(postId);
+
+			return {
+				currentUser: {
+					...state.currentUser,
+					likedPosts: isLiked
+						? state.currentUser.likedPosts?.filter(
+								id => id !== postId
+						  )
+						: [...(state.currentUser.likedPosts || []), postId]
+				}
+			};
+		}),
+
+	addToCollection: postId =>
+		set(state => {
+			if (!state.currentUser) return state;
+
+			const inCollection =
+				state.currentUser.postsInCollection?.includes(postId);
+
+			return {
+				currentUser: {
+					...state.currentUser,
+					postsInCollection: inCollection
+						? state.currentUser.postsInCollection?.filter(
+								id => id !== postId
+						  )
+						: [
+								...(state.currentUser.postsInCollection || []),
+								postId
+						  ]
+				}
+			};
+		}),
 
 	createPost: post => {
 		set(state => {
