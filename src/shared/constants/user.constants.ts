@@ -1,6 +1,7 @@
-import { IUser } from '@/shared/types/user.types';
+import { UserType } from '../types/user.types';
 
-export const user: IUser = {
+export const user: UserType = {
+	id: 1,
 	name: 'Boris Snoopcat',
 	email: 'boris@snoopcat.com',
 	image: '/snoopcat.jpg'

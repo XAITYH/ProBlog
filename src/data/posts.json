@@ -16,21 +16,5 @@
 		"title": "My second post",
 		"extra": "New",
 		"description": "Text..."
-	},
-	{
-		"id": 3,
-		"slug": "third-post",
-		"images": [],
-		"title": "My third post",
-		"extra": "Popular",
-		"description": "Text..."
-	},
-	{
-		"id": 4,
-		"slug": "fourth-post",
-		"images": [],
-		"title": "My fourth post",
-		"extra": "",
-		"description": "Text..."
 	}
 ]

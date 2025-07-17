@@ -44,6 +44,10 @@
 	padding-bottom: var(--mantine-spacing-md);
 }
 
+.extra {
+	user-select: none;
+}
+
 .like,
 .bookmark,
 .share {

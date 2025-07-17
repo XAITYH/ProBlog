@@ -1,5 +1,7 @@
+import CreateForm from '@/features/createForm/createForm';
+
 const PostCreate = () => {
-	return <div>Page</div>;
+	return <CreateForm />;
 };
 
 export default PostCreate;

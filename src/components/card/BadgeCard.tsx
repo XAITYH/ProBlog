@@ -20,8 +20,8 @@ import {
 } from '@mantine/core';
 import { user } from '@/shared/constants/user.constants';
 import { useState } from 'react';
-import { Post } from '@/shared/types/post.types';
-import posts from '@/data/posts.json';
+import { PostType } from '@/shared/types/post.types';
+import { useStore } from '@/lib/store';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import { Zoom } from 'yet-another-react-lightbox/plugins';
@@ -33,6 +33,8 @@ const BadgeCard = () => {
 	const [inCollection, setInCollection] = useState<boolean>(false);
 	const [opened, setOpened] = useState<number | null>(null);
 
+	const posts = useStore(state => state.posts);
+
 	const handleAddToFavorites = () => {
 		setFavorite(!favorite);
 	};
@@ -43,7 +45,7 @@ const BadgeCard = () => {
 
 	return (
 		<>
-			{posts.map((post: Post) => (
+			{posts.map((post: PostType) => (
 				<Card
 					withBorder
 					radius='md'
@@ -51,7 +53,7 @@ const BadgeCard = () => {
 					className={classes.card}
 					key={post.id}
 				>
-					{post.images.length > 0 && (
+					{post.images && (
 						<>
 							<Card.Section>
 								<Image
@@ -88,7 +90,7 @@ const BadgeCard = () => {
 
 					<Card.Section
 						className={classes.section}
-						mt={post.images.length > 0 ? 'md' : 0}
+						mt={post.images ? 'md' : 0}
 					>
 						<Group justify='apart'>
 							<Text fz='lg' fw={500}>
@@ -104,6 +106,7 @@ const BadgeCard = () => {
 										to: 'orange',
 										deg: 90
 									}}
+									className={classes.extra}
 								>
 									{post.extra}
 								</Badge>

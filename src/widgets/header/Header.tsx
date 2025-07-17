@@ -198,7 +198,9 @@ const Header = () => {
 								</UnstyledButton>
 								<Collapse in={linksOpened}>
 									{item.dropdownItems?.map(dropdownItem => (
-										<UnstyledButton
+										<Link
+											href={'/post-create'}
+											onClick={() => closeDrawer()}
 											className={classes.subLink}
 											key={dropdownItem.title}
 										>
@@ -229,7 +231,7 @@ const Header = () => {
 													</Text>
 												</div>
 											</Group>
-										</UnstyledButton>
+										</Link>
 									))}
 								</Collapse>
 							</div>

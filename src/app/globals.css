@@ -5,3 +5,12 @@ body {
 	margin: 0;
 	font-family: 'geist', Helvetica, sans-serif;
 }
+
+.notification {
+	width: 60%;
+	position: absolute;
+	top: 65px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 999999;
+}

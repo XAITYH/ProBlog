@@ -113,11 +113,12 @@ export function AuthForm({ type }: { type: 'login' | 'register' }) {
 	return (
 		<form onSubmit={form.onSubmit(console.log)} className={classes.form}>
 			<TextInput
-				mb={20}
+				size='md'
+				mb={10}
 				label='Email'
 				placeholder='Your email'
 				error={form.errors.email}
-				required
+				withAsterisk
 				rightSection={
 					form.errors.email && (
 						<IconAlertTriangle
@@ -131,9 +132,10 @@ export function AuthForm({ type }: { type: 'login' | 'register' }) {
 			/>
 
 			<PasswordInput
+				size='md'
 				placeholder='Your password'
 				label='Password'
-				required
+				withAsterisk
 				{...form.getInputProps('password')}
 			/>
 
@@ -153,10 +155,11 @@ export function AuthForm({ type }: { type: 'login' | 'register' }) {
 
 			{type === 'register' && (
 				<PasswordInput
+					size='md'
 					mt='sm'
 					label='Confirm password'
 					placeholder='Confirm password'
-					required
+					withAsterisk
 					{...form.getInputProps('confirmPassword')}
 				/>
 			)}

@@ -1,10 +1,17 @@
 import '@mantine/core/styles.css';
-import { MantineProvider, ColorSchemeScript } from '@mantine/core';
+import '@mantine/dropzone/styles.css';
+import { Notifications } from '@mantine/notifications';
+
+import {
+	MantineProvider,
+	ColorSchemeScript,
+	mantineHtmlProps
+} from '@mantine/core';
 
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import Header from '@/components/header/Header';
+import Header from '@/widgets/header/Header';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -19,7 +26,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
 	title: 'ProBlog',
 	description:
-		'ProBlog is about sharing your posts with others from your IT community, code, memes and cats 😻'
+		'ProBlog is about sharing your posts with others from your IT community, projects, memes, news and pets 😻'
 };
 
 export default function RootLayout({
@@ -28,7 +35,7 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang='en'>
+		<html lang='en' {...mantineHtmlProps}>
 			<head>
 				<ColorSchemeScript />
 			</head>
@@ -37,6 +44,11 @@ export default function RootLayout({
 			>
 				<MantineProvider defaultColorScheme='dark'>
 					<Header />
+					<Notifications
+						position='top-center'
+						className='notification'
+					/>
+
 					{children}
 				</MantineProvider>
 			</body>
