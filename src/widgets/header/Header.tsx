@@ -77,7 +77,7 @@ const Header = () => {
 						<SimpleGrid cols={2} spacing={0}>
 							{item.dropdownItems?.map(dropdownItem => (
 								<Link
-									href={'/post-create'}
+									href={`/post-create?topic=${dropdownItem.topic}`}
 									className={classes.subLink}
 									key={dropdownItem.title}
 								>
@@ -142,28 +142,26 @@ const Header = () => {
 	));
 
 	return (
-		<Box pb={30}>
-			<header className={classes.header}>
-				<Group justify='space-between' h='100%'>
-					<ThemeToggleButton />
-					<Group
-						h='100%'
-						gap={0}
-						visibleFrom='sm'
-						className={classes.nav_links}
-					>
-						{renderNavLinks}
-					</Group>
-
-					<Group visibleFrom='sm'>{renderNavButtons}</Group>
-
-					<Burger
-						opened={drawerOpened}
-						onClick={toggleDrawer}
-						hiddenFrom='sm'
-					/>
+		<header className={classes.header}>
+			<Group justify='space-between' h='100%'>
+				<ThemeToggleButton />
+				<Group
+					h='100%'
+					gap={0}
+					visibleFrom='sm'
+					className={classes.nav_links}
+				>
+					{renderNavLinks}
 				</Group>
-			</header>
+
+				<Group visibleFrom='sm'>{renderNavButtons}</Group>
+
+				<Burger
+					opened={drawerOpened}
+					onClick={toggleDrawer}
+					hiddenFrom='sm'
+				/>
+			</Group>
 
 			<Drawer
 				opened={drawerOpened}
@@ -199,7 +197,7 @@ const Header = () => {
 								<Collapse in={linksOpened}>
 									{item.dropdownItems?.map(dropdownItem => (
 										<Link
-											href={'/post-create'}
+											href={`/post-create?topic=${dropdownItem.topic}`}
 											onClick={() => closeDrawer()}
 											className={classes.subLink}
 											key={dropdownItem.title}
@@ -254,7 +252,7 @@ const Header = () => {
 					</Group>
 				</ScrollArea>
 			</Drawer>
-		</Box>
+		</header>
 	);
 };
 

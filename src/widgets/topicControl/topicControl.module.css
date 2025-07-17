@@ -23,6 +23,8 @@
 }
 
 .label {
+	text-transform: capitalize;
+
 	&,
 	&:hover {
 		&[data-active] {

@@ -1,7 +1,7 @@
 [
 	{
 		"id": 1,
-		"slug": "first-post",
+		"topic": "memes",
 		"images": ["/snoopcat.jpg", "/snoopcat.jpg"],
 		"title": "CATMINT",
 		"extra": "Trending",
@@ -9,7 +9,7 @@
 	},
 	{
 		"id": 2,
-		"slug": "second-post",
+		"topic": "pets",
 		"images": [
 			"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSguH4VFZ9f5cQ-mc1dqvYwVV7CWZoywcH9VQ&s"
 		],

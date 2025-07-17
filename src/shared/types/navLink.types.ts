@@ -1,4 +1,5 @@
 import { TablerIcon } from '@tabler/icons-react';
+import { DropdownLink } from '@/shared/types/dropdownLink.types';
 
 export type NavLink = {
 	label: string;
@@ -6,9 +7,5 @@ export type NavLink = {
 	key: string;
 	type: 'link' | 'dropdown' | 'button';
 	icon?: TablerIcon;
-	dropdownItems?: {
-		title: string;
-		description: string;
-		icon: TablerIcon;
-	}[];
+	dropdownItems?: DropdownLink[];
 };

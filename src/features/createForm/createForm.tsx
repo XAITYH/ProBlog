@@ -3,7 +3,6 @@
 import { useRef, useState } from 'react';
 import {
 	IconAlertCircle,
-	IconCheck,
 	IconCloudUpload,
 	IconDownload,
 	IconX
@@ -23,8 +22,9 @@ import classes from './createForm.module.css';
 import { PostType } from '@/shared/types/post.types';
 import { useStore } from '@/lib/store';
 import { notifications } from '@mantine/notifications';
+import { DropdownLink } from '@/shared/types/dropdownLink.types';
 
-const CreateForm = () => {
+const CreateForm = ({ topic }: Pick<DropdownLink, 'topic'>) => {
 	const MAX_TITLE_LENGTH = 100;
 	const MAX_DESCRIPTION_LENGTH = 1000;
 
@@ -91,7 +91,7 @@ const CreateForm = () => {
 
 	return (
 		<form
-			onSubmit={form.onSubmit(values => newPost(values))}
+			onSubmit={form.onSubmit(values => newPost({ topic, ...values }))}
 			className={classes.form}
 		>
 			{showSuccess && (

@@ -22,11 +22,5 @@ export const NAV_LINKS: NavLink[] = [
 		href: '/help',
 		key: 'help',
 		type: 'link'
-	},
-	{
-		label: 'News',
-		href: '/news',
-		key: 'news',
-		type: 'link'
 	}
 ];

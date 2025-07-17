@@ -1,11 +1,18 @@
 .header {
-	position: relative;
+	position: sticky;
+	top: 0;
+	z-index: 1000;
 	height: 60px;
 	padding-left: var(--mantine-spacing-md);
 	padding-right: var(--mantine-spacing-md);
+	background-color: light-dark(
+		var(--mantine-color-white),
+		var(--mantine-color-dark-7)
+	);
 	color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
 	border-bottom: 1px solid
 		light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+	margin-bottom: 30px;
 }
 
 .header_hidden {

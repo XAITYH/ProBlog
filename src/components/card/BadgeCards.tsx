@@ -1,0 +1,206 @@
+'use client';
+
+import {
+	IconBookmark,
+	IconBookmarkFilled,
+	IconHeart,
+	IconHeartFilled,
+	IconShare2
+} from '@tabler/icons-react';
+import {
+	ActionIcon,
+	Avatar,
+	Badge,
+	Card,
+	Group,
+	Image,
+	Spoiler,
+	Text,
+	UnstyledButton
+} from '@mantine/core';
+import { user } from '@/shared/constants/user.constants';
+import { useState } from 'react';
+import { PostType } from '@/shared/types/post.types';
+import { useStore } from '@/lib/store';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
+import { Zoom } from 'yet-another-react-lightbox/plugins';
+
+import classes from './badgeCards.module.css';
+import { TopicTypes } from '@/shared/types/topics.types';
+
+const BadgeCards = ({ currentTopic }: { currentTopic: TopicTypes }) => {
+	const [favorite, setFavorite] = useState<boolean>(false);
+	const [inCollection, setInCollection] = useState<boolean>(false);
+	const [opened, setOpened] = useState<number | null>(null);
+
+	const posts = useStore(state => state.posts);
+
+	const filteredPosts =
+		currentTopic === 'all'
+			? posts
+			: posts.filter(post => post.topic === currentTopic);
+
+	const handleAddToFavorites = () => {
+		setFavorite(!favorite);
+	};
+
+	const handleAddToCollection = () => {
+		setInCollection(!inCollection);
+	};
+
+	return (
+		<>
+			{filteredPosts.length > 0 ? (
+				filteredPosts.map((post: PostType) => (
+					<Card
+						withBorder
+						radius='md'
+						p='md'
+						className={classes.card}
+						key={post.id}
+					>
+						{post.images && (
+							<>
+								<Card.Section>
+									<Image
+										key={post.id}
+										src={post.images[0]}
+										className={classes.image}
+										loading='lazy'
+										onClick={() => setOpened(post.id)}
+									/>
+								</Card.Section>
+
+								<Lightbox
+									open={post.id === opened}
+									close={() => setOpened(null)}
+									plugins={[Zoom]}
+									slides={post.images.map(image => ({
+										src: image
+									}))}
+									controller={{
+										disableSwipeNavigation:
+											post.images.length < 2
+									}}
+									render={
+										post.images.length < 2
+											? {
+													buttonNext: () => null,
+													buttonPrev: () => null
+											  }
+											: {}
+									}
+								/>
+							</>
+						)}
+
+						<Card.Section
+							className={classes.section}
+							mt={post.images ? 'md' : 0}
+						>
+							<Group justify='apart'>
+								<Text fz='lg' fw={500}>
+									{post.title}
+								</Text>
+
+								{post.extra && (
+									<Badge
+										size='sm'
+										variant='gradient'
+										gradient={{
+											from: 'pink',
+											to: 'orange',
+											deg: 90
+										}}
+										className={classes.extra}
+									>
+										{post.extra}
+									</Badge>
+								)}
+							</Group>
+							<Spoiler
+								maxHeight={60}
+								showLabel='Show more'
+								hideLabel='Show less'
+							>
+								<Text fz='sm' mt='xs'>
+									{post.description}
+								</Text>
+							</Spoiler>
+						</Card.Section>
+
+						<Group mt='xs' align='center'>
+							<UnstyledButton className={classes.user}>
+								<Group gap={8} align='center'>
+									<Avatar src={user.image} radius='xl' />
+
+									<Text
+										className={classes.user_name}
+										size='sm'
+										fw={500}
+									>
+										{user.name}
+									</Text>
+								</Group>
+							</UnstyledButton>
+
+							<Group gap={10}>
+								<ActionIcon
+									variant='default'
+									radius='md'
+									size={36}
+									onClick={handleAddToFavorites}
+								>
+									{favorite ? (
+										<IconHeartFilled
+											className={classes.like}
+											stroke={1.5}
+										/>
+									) : (
+										<IconHeart
+											className={classes.like}
+											stroke={1.5}
+										/>
+									)}
+								</ActionIcon>
+								<ActionIcon
+									variant='default'
+									radius='md'
+									size={36}
+									onClick={handleAddToCollection}
+								>
+									{inCollection ? (
+										<IconBookmarkFilled
+											className={classes.bookmark}
+											stroke={1.5}
+										/>
+									) : (
+										<IconBookmark
+											className={classes.bookmark}
+											stroke={1.5}
+										/>
+									)}
+								</ActionIcon>
+								<ActionIcon
+									variant='default'
+									radius='md'
+									size={36}
+								>
+									<IconShare2
+										className={classes.share}
+										stroke={1.5}
+									/>
+								</ActionIcon>
+							</Group>
+						</Group>
+					</Card>
+				))
+			) : (
+				<Text>There are no posts on this topic.</Text>
+			)}
+		</>
+	);
+};
+
+export default BadgeCards;
