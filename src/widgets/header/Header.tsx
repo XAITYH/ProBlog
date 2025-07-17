@@ -25,8 +25,9 @@ import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { NAV_BUTTONS } from '@/shared/constants/headerBtns.constants';
 import { NAV_LINKS } from '@/shared/constants/navLinks.constant';
+import React from 'react';
 
-const Header = () => {
+const Header = React.memo(() => {
 	const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
 		useDisclosure(false);
 	const [linksOpened, { toggle: toggleLinks }] = useDisclosure(false);
@@ -254,6 +255,6 @@ const Header = () => {
 			</Drawer>
 		</header>
 	);
-};
+});
 
 export default Header;

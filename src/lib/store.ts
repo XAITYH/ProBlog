@@ -35,6 +35,8 @@ export const useStore = create<Store>(set => ({
 	...initialStoreState,
 
 	// Actions
+
+	// User
 	createUser: user =>
 		set(state => ({
 			users: [...state.users, { id: users.length + 1, ...user }]
@@ -52,6 +54,7 @@ export const useStore = create<Store>(set => ({
 			users: state.users.filter(user => user.id !== userId)
 		})),
 
+	// User interactions with posts
 	likePost: postId =>
 		set(state => {
 			if (!state.currentUser) return state;
@@ -92,6 +95,7 @@ export const useStore = create<Store>(set => ({
 			};
 		}),
 
+	// Post
 	createPost: post => {
 		set(state => {
 			const titleExists = state.posts.some(
@@ -126,6 +130,7 @@ export const useStore = create<Store>(set => ({
 			posts: state.posts.filter(post => post.id !== postId)
 		})),
 
+	// Reset data to initial state
 	resetStore: () =>
 		set({
 			currentUser: user,
