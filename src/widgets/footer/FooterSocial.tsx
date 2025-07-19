@@ -16,7 +16,7 @@ export function FooterSocial() {
 					justify='flex-end'
 					wrap='nowrap'
 				>
-					<Link href='https://github.com/XAITYH'>
+					<Link href='https://www.tiktok.com/@xaityh'>
 						<ActionIcon size='lg' color='gray' variant='subtle'>
 							<IconBrandTiktok size={18} stroke={1.5} />
 						</ActionIcon>
@@ -28,7 +28,7 @@ export function FooterSocial() {
 						</ActionIcon>
 					</Link>
 
-					<Link href='https://github.com/XAITYH'>
+					<Link href='https://www.instagram.com/xaityh2.0'>
 						<ActionIcon size='lg' color='gray' variant='subtle'>
 							<IconBrandInstagram size={18} stroke={1.5} />
 						</ActionIcon>

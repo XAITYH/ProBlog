@@ -1,4 +1,4 @@
-import { AuthForm } from '@/widgets/authForm/AuthForm';
+import { AuthForm } from '@/features/authForm/AuthForm';
 import React from 'react';
 
 const Register = () => {

@@ -1,32 +1,55 @@
 'use client';
 
 import { useRef, useState } from 'react';
+
+import classes from './postForm.module.css';
+
 import {
 	IconAlertCircle,
 	IconCloudUpload,
 	IconDownload,
 	IconX
 } from '@tabler/icons-react';
+
 import {
 	Alert,
 	Button,
 	Group,
+	Select,
 	Text,
 	Textarea,
 	TextInput,
 	useMantineTheme
 } from '@mantine/core';
+
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import { useForm } from '@mantine/form';
-import classes from './createForm.module.css';
-import { PostType } from '@/shared/types/post.types';
-import { useStore } from '@/lib/store';
 import { notifications } from '@mantine/notifications';
-import { DropdownLink } from '@/shared/types/dropdownLink.types';
 
-const CreateForm = ({ topic }: Pick<DropdownLink, 'topic'>) => {
-	const MAX_TITLE_LENGTH = 100;
-	const MAX_DESCRIPTION_LENGTH = 1000;
+import { PostType } from '@/shared/types/post.types';
+
+import { useStore } from '@/lib/store';
+
+import { MAX_TITLE_LENGTH } from '@/shared/constants/maxTitleLength';
+import { MAX_DESCRIPTION_LENGTH } from '@/shared/constants/maxDescriptionLength';
+
+import { TopicTypes } from '@/shared/types/topics.types';
+import { TopicVars } from '@/shared/constants/topics.constants';
+
+import validateImageFile from './imagesFunctions/validateFile';
+import Image from 'next/image';
+
+type PostFormType = {
+	images?: string[];
+	title?: string;
+	description?: string;
+	topic: Omit<TopicTypes, 'all'>;
+};
+
+const PostForm = ({ images, title, description, topic }: PostFormType) => {
+	const [files, setFiles] = useState<File[]>([]);
+	const [previews, setPreviews] = useState<string[]>([]);
+	const [isUploading, setIsUploading] = useState(false);
 
 	const [showTitleWarning, setShowTitleWarning] = useState(false);
 	const [showDescriptionWarning, setShowDescriptionWarning] = useState(false);
@@ -36,12 +59,14 @@ const CreateForm = ({ topic }: Pick<DropdownLink, 'topic'>) => {
 	const form = useForm({
 		mode: 'uncontrolled',
 		initialValues: {
-			image: '',
-			title: '',
-			description: ''
+			images: images ? images : [],
+			title: title ? title : '',
+			description: description ? description : '',
+			topic: topic
 		},
 
 		validate: {
+			images: files => (files.length > 5 ? 'Too many files' : null),
 			title: value => (value === '' ? 'Title is empty' : null),
 			description: value => (value === '' ? 'Description is empty' : null)
 		},
@@ -56,6 +81,28 @@ const CreateForm = ({ topic }: Pick<DropdownLink, 'topic'>) => {
 		}
 	});
 
+	const handleDrop = (acceptedFiles: File[]) => {
+		const validFiles = acceptedFiles.filter(file => {
+			const validation = validateImageFile(file);
+			if (!validation.isValid) {
+				validation.errors.forEach(error => {
+					notifications.show({
+						title: 'Invalid file',
+						message: error,
+						color: 'red'
+					});
+				});
+				return false;
+			}
+			return true;
+		});
+
+		const newPreviews = validFiles.map(file => URL.createObjectURL(file));
+
+		setFiles(prev => [...prev, ...validFiles]);
+		setPreviews(prev => [...prev, ...newPreviews]);
+	};
+
 	const theme = useMantineTheme();
 	const openRef = useRef<() => void>(null);
 
@@ -65,10 +112,14 @@ const CreateForm = ({ topic }: Pick<DropdownLink, 'topic'>) => {
 
 	const createPost = useStore(state => state.createPost);
 
-	function newPost(postData: Omit<PostType, 'id'>) {
+	async function newPost(postData: Omit<PostType, 'id'>) {
+		setIsUploading(true);
 		try {
 			createPost(postData);
+
 			form.reset();
+			setPreviews([]);
+			setFiles([]);
 
 			notifications.show({
 				title: 'Success!',
@@ -86,12 +137,27 @@ const CreateForm = ({ topic }: Pick<DropdownLink, 'topic'>) => {
 				color: 'red',
 				autoClose: 2500
 			});
+		} finally {
+			setIsUploading(false);
 		}
 	}
 
 	return (
 		<form
-			onSubmit={form.onSubmit(values => newPost({ topic, ...values }))}
+			onSubmit={form.onSubmit(values => {
+				try {
+					newPost(values);
+				} catch (error) {
+					notifications.show({
+						title: 'Error',
+						message:
+							error instanceof Error
+								? error.message
+								: 'Upload failed',
+						color: 'red'
+					});
+				}
+			})}
 			className={classes.form}
 		>
 			{showSuccess && (
@@ -108,12 +174,15 @@ const CreateForm = ({ topic }: Pick<DropdownLink, 'topic'>) => {
 
 			<div className={classes.wrapper}>
 				<Dropzone
+					multiple
 					openRef={openRef}
-					onDrop={() => {}}
+					onDrop={handleDrop}
 					radius='md'
 					className={classes.dropzone}
 					accept={[MIME_TYPES.png, MIME_TYPES.jpeg, MIME_TYPES.gif]}
 					maxSize={10 * 1024 ** 2}
+					key={form.key('images')}
+					{...form.getInputProps('images')}
 				>
 					<div style={{ pointerEvents: 'none' }}>
 						<Group justify='center'>
@@ -150,8 +219,8 @@ const CreateForm = ({ topic }: Pick<DropdownLink, 'topic'>) => {
 
 						<Text className={classes.description}>
 							Drag&apos;n&apos;drop files here to upload. We can
-							accept <i>.png, jpeg</i> and <i>.gif</i> files that
-							are less than 10mb in size.
+							accept 5 <i>.png, jpeg</i> and <i>.gif</i> files
+							that are less than 10mb each in size.
 						</Text>
 					</div>
 				</Dropzone>
@@ -165,6 +234,49 @@ const CreateForm = ({ topic }: Pick<DropdownLink, 'topic'>) => {
 					Select files
 				</Button>
 			</div>
+
+			{files.length > 5 && (
+				<Text size='sm' mt='xs' className={classes.error}>
+					More than 5 files provided
+				</Text>
+			)}
+
+			{previews.length > 0 && (
+				<div
+					className={
+						files.length > 5
+							? `${classes.previews} ${classes.previews_error}`
+							: `${classes.previews}`
+					}
+				>
+					{previews.map((preview, index) => (
+						<div key={index} className={classes.previewWrapper}>
+							<Image
+								src={preview}
+								alt={`Preview ${index + 1}`}
+								width={100}
+								height={100}
+								className={classes.previewImage}
+							/>
+							<button
+								type='button'
+								className={classes.removePreview}
+								onClick={() => {
+									const updatedPreviews = [...previews];
+									const updatedFiles = [...files];
+									updatedPreviews.splice(index, 1);
+									updatedFiles.splice(index, 1);
+									setPreviews(updatedPreviews);
+									setFiles(updatedFiles);
+								}}
+							>
+								<IconX size={16} />
+							</button>
+						</div>
+					))}
+				</div>
+			)}
+
 			<TextInput
 				withAsterisk
 				label={`Title (${titleSymbolsLeft} symbols left)`}
@@ -214,6 +326,17 @@ const CreateForm = ({ topic }: Pick<DropdownLink, 'topic'>) => {
 				</Alert>
 			)}
 
+			<Select
+				mt='sm'
+				size='md'
+				label='Select topic'
+				withAsterisk
+				allowDeselect={false}
+				data={TopicVars.filter(topicVar => topicVar !== 'all')}
+				key={form.key('topic')}
+				{...form.getInputProps('topic')}
+			/>
+
 			<Button type='submit' mt='sm' fullWidth>
 				Post
 			</Button>
@@ -221,4 +344,4 @@ const CreateForm = ({ topic }: Pick<DropdownLink, 'topic'>) => {
 	);
 };
 
-export default CreateForm;
+export default PostForm;

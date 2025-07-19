@@ -7,7 +7,7 @@ import classes from './page.module.css';
 import CardsList from '@/components/cardsList/CardsList';
 
 import { FooterSocial } from '@/widgets/footer/FooterSocial';
-import { TopicControl } from '@/widgets/topicControl/TopicControl';
+import { TopicControl } from '@/features/topicControl/TopicControl';
 
 import { TopicTypes } from '@/shared/types/topics.types';
 

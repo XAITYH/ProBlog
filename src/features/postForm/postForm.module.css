@@ -31,6 +31,42 @@
 	bottom: -20px;
 }
 
+.error {
+	color: var(--mantine-color-red-8);
+}
+
+.previews {
+	display: flex;
+	flex-wrap: wrap;
+	border-radius: var(--mantine-radius-sm);
+	background-color: var(--mantine-color-dark-6);
+	margin-bottom: var(--mantine-spacing-md);
+	padding: var(--mantine-spacing-xs);
+	gap: var(--mantine-spacing-md);
+}
+
+.previews_error {
+	border: 1px solid var(--mantine-color-red-8);
+}
+
+.previewImage {
+	border-radius: var(--mantine-radius-sm);
+	min-width: 50px;
+	max-width: 200px;
+}
+
+.previewWrapper {
+	position: relative;
+}
+
+.removePreview {
+	position: absolute;
+	top: 0;
+	cursor: pointer;
+	background-color: var(--mantine-color-dark-6);
+	border-radius: 0 0 5px 0;
+}
+
 .description {
 	text-align: center;
 	font-size: var(--mantine-font-size-sm);

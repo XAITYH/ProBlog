@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String  @id @default(uuid())
+  email    String  @unique
+  username String?
+  password String
+  image    String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  posts       Post[]
+  likes       Like[]
+  collections Collection[]
+
+  @@map("user")
+}
+
+model Post {
+  id          Int     @id @default(autoincrement())
+  title       String  @unique
+  description String
+  topic       String
+  files       String?
+
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String @map("author_id")
+
+  likes       Like[]
+  collections Collection[]
+
+  @@map("post")
+}
+
+model Like {
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+  post   Post   @relation(fields: [postId], references: [id])
+  postId Int    @map("post_id")
+
+  isPublic Boolean @default(false) @map("is_public")
+
+  createdAt  DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+
+  @@id([userId, postId])
+}
+
+model Collection {
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+  post   Post   @relation(fields: [postId], references: [id])
+  postId Int    @map("post_id")
+
+  isPublic Boolean @default(false) @map("is_public")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@id([userId, postId])
+}

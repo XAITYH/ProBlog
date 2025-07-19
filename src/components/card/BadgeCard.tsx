@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 
 import classes from './badgeCard.module.css';
 
@@ -18,18 +18,16 @@ import {
 	Badge,
 	Card,
 	Group,
-	Image,
 	Spoiler,
 	Text,
 	UnstyledButton
 } from '@mantine/core';
 
-import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 
-import { Zoom } from 'yet-another-react-lightbox/plugins';
 import { PostType } from '@/shared/types/post.types';
 import { UserType } from '@/shared/types/user.types';
+import ImageSection from './ui/ImageSection';
 
 type BadgeCardTypes = {
 	post: PostType;
@@ -40,8 +38,6 @@ type BadgeCardTypes = {
 
 const BadgeCard = React.memo(
 	({ post, currentUser, onLike, onAddToCollection }: BadgeCardTypes) => {
-		const [opened, setOpened] = useState<number | null>(null);
-
 		return (
 			<Card
 				withBorder
@@ -50,43 +46,13 @@ const BadgeCard = React.memo(
 				className={classes.card}
 				key={post.id}
 			>
-				{post.images && (
-					<>
-						<Card.Section>
-							<Image
-								key={post.id}
-								src={post.images[0]}
-								className={classes.image}
-								loading='lazy'
-								onClick={() => setOpened(post.id)}
-							/>
-						</Card.Section>
-
-						<Lightbox
-							open={post.id === opened}
-							close={() => setOpened(null)}
-							plugins={[Zoom]}
-							slides={post.images.map(image => ({
-								src: image
-							}))}
-							controller={{
-								disableSwipeNavigation: post.images.length < 2
-							}}
-							render={
-								post.images.length < 2
-									? {
-											buttonNext: () => null,
-											buttonPrev: () => null
-									  }
-									: {}
-							}
-						/>
-					</>
+				{post.images && post.images?.length > 0 && (
+					<ImageSection post={post} />
 				)}
 
 				<Card.Section
 					className={classes.section}
-					mt={post.images ? 'md' : 0}
+					mt={post.images && post.images.length > 0 ? 'md' : 0}
 				>
 					<Group justify='apart'>
 						<Text fz='lg' fw={500}>

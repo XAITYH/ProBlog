@@ -8,11 +8,6 @@
 	max-width: 400px;
 }
 
-.image {
-	object-fit: contain;
-	cursor: pointer;
-}
-
 .carousel {
 	@mixin hover {
 		.carouselControls {

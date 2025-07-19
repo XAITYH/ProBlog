@@ -1,0 +1,15 @@
+const uploadFiles = async (files: File[]): Promise<string[]> => {
+	const formData = new FormData();
+	files.forEach(file => formData.append('file', file));
+
+	const response = await fetch('/api/upload', {
+		method: 'POST',
+		body: formData
+	});
+
+	if (!response.ok) throw new Error('Upload failed');
+	const data = await response.json();
+	return data.urls;
+};
+
+export default uploadFiles;
