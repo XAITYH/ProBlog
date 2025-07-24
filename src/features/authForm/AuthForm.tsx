@@ -89,7 +89,7 @@ export function AuthForm({ type, onSubmit }: AuthFormType) {
 	const [originalFileType, setOriginalFileType] =
 		useState<string>('image/jpeg');
 	const [originalFileExt, setOriginalFileExt] = useState<string>('jpg');
-
+	const [isLoading, setIsLoading] = useState(false);
 	const form = useForm<FormType>({
 		mode: 'controlled',
 		initialValues: {
@@ -208,6 +208,7 @@ export function AuthForm({ type, onSubmit }: AuthFormType) {
 	};
 
 	const handleCropSave = async () => {
+		setIsLoading(true);
 		try {
 			if (!imageSrc || !croppedAreaPixels) return;
 			const croppedBlob = await getCroppedImg(
@@ -254,6 +255,8 @@ export function AuthForm({ type, onSubmit }: AuthFormType) {
 				message: 'Failed to save image',
 				color: 'red'
 			});
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -292,7 +295,7 @@ export function AuthForm({ type, onSubmit }: AuthFormType) {
 						password: form.values.password,
 						...(type === 'register' && {
 							name: form.values.name,
-							image: imageUrl
+							image: imageUrl ?? null
 						})
 					});
 				}}
@@ -366,7 +369,12 @@ export function AuthForm({ type, onSubmit }: AuthFormType) {
 								</div>
 							)}
 							<Group mt='md' className='right-0'>
-								<Button onClick={handleCropSave}>Save</Button>
+								<Button
+									onClick={handleCropSave}
+									loading={isLoading}
+								>
+									Save
+								</Button>
 							</Group>
 						</Modal>
 
