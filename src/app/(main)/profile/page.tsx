@@ -187,15 +187,17 @@ const Profile = () => {
 							flexWrap: 'wrap'
 						}}
 					>
-						<Button
-							leftSection={<IconEdit size={18} />}
-							color='gray'
-							variant='light'
-							onClick={handleEditProfile}
-							fullWidth
-						>
-							Edit Profile
-						</Button>
+						{currentUser?.password !== null && (
+							<Button
+								leftSection={<IconEdit size={18} />}
+								color='gray'
+								variant='light'
+								onClick={handleEditProfile}
+								fullWidth
+							>
+								Edit Profile
+							</Button>
+						)}
 						<Button
 							leftSection={<IconLogout size={18} />}
 							color='gray'

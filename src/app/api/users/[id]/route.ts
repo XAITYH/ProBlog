@@ -56,6 +56,10 @@ export async function PUT(
 		return NextResponse.json({ success: true, updatedUser });
 	} catch (error) {
 		console.error('[USER_UPDATE_ERROR]', error);
+		return NextResponse.json(
+			{ error: 'Failed to update user' },
+			{ status: 500 }
+		);
 	}
 }
 

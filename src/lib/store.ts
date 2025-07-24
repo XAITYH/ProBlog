@@ -2,6 +2,7 @@ import { PostType } from '@/shared/types/post.types';
 import { UserType } from '@/shared/types/user.types';
 import { create } from 'zustand';
 import { TopicTypes } from '@/shared/types/topics.types';
+import { signIn } from 'next-auth/react';
 
 type Store = {
 	currentUser: UserType | null;
@@ -56,10 +57,14 @@ export const useStore = create<Store>((set, get) => ({
 		try {
 			const res = await fetch(`/api/users/${currentUser.id}`, {
 				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(updates)
 			});
 
 			if (!res.ok) throw new Error('Failed to update');
+
+			const data = await res.json();
+			set({ currentUser: { ...currentUser, ...data.updatedUser } });
 		} catch (error) {
 			console.error('Failed to update user:', error);
 		}
@@ -251,8 +256,8 @@ export const useStore = create<Store>((set, get) => ({
 				currentUser: state.currentUser
 					? {
 							...state.currentUser,
-							likedPosts: likedPosts.map(Number),
-							collections: collections.map(Number)
+							likedPosts: likedPosts?.map(Number),
+							collections: collections?.map(Number)
 					  }
 					: null
 			}));

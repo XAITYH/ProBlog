@@ -27,9 +27,12 @@ import { NAV_BUTTONS } from '@/shared/constants/headerBtns.constants';
 import { NAV_LINKS } from '@/shared/constants/navLinks.constant';
 import React from 'react';
 import { useSession } from 'next-auth/react';
+import { useStore } from '@/lib/store';
 
 const Header = React.memo(() => {
 	const { data: session, status } = useSession();
+
+	const currentUser = useStore(state => state.currentUser);
 
 	const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
 		useDisclosure(false);
@@ -57,7 +60,7 @@ const Header = React.memo(() => {
 					p={0}
 				>
 					<Text fw={500} size='sm'>
-						{session.user?.name}
+						{currentUser?.name}
 					</Text>
 				</UnstyledButton>
 			);
