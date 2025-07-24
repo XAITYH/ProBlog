@@ -5,7 +5,7 @@ import { authOptions } from '@/lib/auth';
 
 export async function POST(
 	_request: NextRequest,
-	{ params }: { params: Promise<{ id: string }> }
+	context: { params: Promise<{ id: string }> }
 ) {
 	try {
 		const session = await getServerSession(authOptions);
@@ -16,7 +16,7 @@ export async function POST(
 			);
 
 		// 2. Parse ID
-		const { id } = await params;
+		const { id } = await context.params;
 		const postId = Number(id);
 		if (isNaN(postId))
 			return NextResponse.json(
