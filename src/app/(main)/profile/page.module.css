@@ -1,0 +1,30 @@
+.profile {
+	width: 100%;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	padding: 1rem 0;
+}
+
+.carouselWrapper {
+	width: 100%;
+}
+
+/* Center carousel slides */
+.carouselWrapper :global(.mantine-Carousel-slide) {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+@media (max-width: 600px) {
+	.profile {
+		padding: 0.5rem 0;
+	}
+	.carouselWrapper {
+		max-width: 100vw;
+		padding: 0 0.5rem;
+	}
+}

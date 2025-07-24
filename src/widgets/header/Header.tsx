@@ -26,14 +26,43 @@ import Link from 'next/link';
 import { NAV_BUTTONS } from '@/shared/constants/headerBtns.constants';
 import { NAV_LINKS } from '@/shared/constants/navLinks.constant';
 import React from 'react';
+import { useSession } from 'next-auth/react';
 
 const Header = React.memo(() => {
+	const { data: session, status } = useSession();
+
 	const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
 		useDisclosure(false);
 	const [linksOpened, { toggle: toggleLinks }] = useDisclosure(false);
 	const theme = useMantineTheme();
 	const router = useRouter();
 	const pathname = usePathname();
+
+	const renderAuthButtons = () => {
+		if (status === 'loading')
+			return (
+				<Button loading variant='default'>
+					Loading...
+				</Button>
+			);
+
+		if (session) {
+			return (
+				<UnstyledButton
+					onClick={() => {
+						router.push('/profile');
+						closeDrawer();
+					}}
+					className={getActiveLink('/profile')}
+					p={0}
+				>
+					<Text fw={500} size='sm'>
+						{session.user?.name}
+					</Text>
+				</UnstyledButton>
+			);
+		}
+	};
 
 	const getActiveLink = (href: string) => {
 		return pathname === href
@@ -155,7 +184,11 @@ const Header = React.memo(() => {
 					{renderNavLinks}
 				</Group>
 
-				<Group visibleFrom='sm'>{renderNavButtons}</Group>
+				<Group visibleFrom='sm'>
+					{status === 'unauthenticated'
+						? renderNavButtons
+						: renderAuthButtons()}
+				</Group>
 
 				<Burger
 					opened={drawerOpened}
@@ -249,7 +282,11 @@ const Header = React.memo(() => {
 					<Divider my='sm' />
 
 					<Group justify='center' grow pb='xl' px='md'>
-						{renderNavButtons}
+						{status === 'unauthenticated' ? (
+							renderNavButtons
+						) : (
+							<>{renderAuthButtons()}</>
+						)}
 					</Group>
 				</ScrollArea>
 			</Drawer>

@@ -5,7 +5,10 @@ import {
 	Box,
 	Button,
 	Center,
+	Divider,
 	Group,
+	Modal,
+	Paper,
 	PasswordInput,
 	Progress,
 	Text,
@@ -13,6 +16,12 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import classes from './authForm.module.css';
+import { GoogleButton } from './ui/GoogleButton';
+import { AuthFormType } from '@/shared/types/authForm.types';
+import { signIn } from 'next-auth/react';
+import { useCallback, useRef, useState } from 'react';
+import Cropper from 'react-easy-crop';
+import { uploadFile } from '@/lib/blob';
 
 function PasswordRequirement({
 	meets,
@@ -35,6 +44,7 @@ function PasswordRequirement({
 	);
 }
 
+// Password requirements
 const requirements = [
 	{ re: /[0-9]/, label: 'Includes number' },
 	{ re: /[a-z]/, label: 'Includes lowercase letter' },
@@ -42,6 +52,7 @@ const requirements = [
 	{ re: /[$&+,:;=?@#|'<>.^*()%!-]/, label: 'Includes special symbol' }
 ];
 
+// Check how strong password is
 function getStrength(password: string) {
 	let multiplier = password.length > 5 ? 0 : 1;
 
@@ -54,9 +65,32 @@ function getStrength(password: string) {
 	return Math.max(100 - (100 / (requirements.length + 1)) * multiplier, 0);
 }
 
-export function AuthForm({ type }: { type: 'login' | 'register' }) {
-	const form = useForm({
+type FormType = {
+	name?: string;
+	email: string;
+	password: string;
+	confirmPassword?: string;
+};
+
+export function AuthForm({ type, onSubmit }: AuthFormType) {
+	const [crop, setCrop] = useState({ x: 0, y: 0 });
+	const [zoom, setZoom] = useState(1);
+	const [imageSrc, setImageSrc] = useState<string | null>(null);
+	const [croppedAreaPixels, setCroppedAreaPixels] = useState<{
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	} | null>(null);
+	const [croppedImage, setCroppedImage] = useState<string | null>(null);
+	const [imageUrl, setImageUrl] = useState<string | null>(null);
+	const [cropModalOpen, setCropModalOpen] = useState(false);
+	const inputRef = useRef<HTMLInputElement>(null);
+
+	const form = useForm<FormType>({
+		mode: 'controlled',
 		initialValues: {
+			name: '',
 			email: '',
 			password: '',
 			confirmPassword: ''
@@ -110,63 +144,248 @@ export function AuthForm({ type }: { type: 'login' | 'register' }) {
 			/>
 		));
 
+	const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (e.target.files && e.target.files.length > 0) {
+			const reader = new FileReader();
+			reader.addEventListener('load', () => {
+				setImageSrc(reader.result as string);
+				setCropModalOpen(true);
+			});
+			reader.readAsDataURL(e.target.files[0]);
+		}
+	};
+
+	const onCropComplete = useCallback(
+		(
+			_: unknown,
+			croppedAreaPixels: {
+				x: number;
+				y: number;
+				width: number;
+				height: number;
+			}
+		) => {
+			setCroppedAreaPixels(croppedAreaPixels);
+		},
+		[]
+	);
+
+	const getCroppedImg = async (
+		imageSrc: string,
+		crop: { x: number; y: number; width: number; height: number }
+	) => {
+		const image = new window.Image();
+		image.src = imageSrc;
+		await new Promise(resolve => (image.onload = resolve));
+		const canvas = document.createElement('canvas');
+		const ctx = canvas.getContext('2d');
+		canvas.width = crop.width;
+		canvas.height = crop.height;
+		ctx?.drawImage(
+			image,
+			crop.x,
+			crop.y,
+			crop.width,
+			crop.height,
+			0,
+			0,
+			crop.width,
+			crop.height
+		);
+		return new Promise<Blob>((resolve, reject) => {
+			canvas.toBlob(blob => {
+				if (blob) resolve(blob);
+				else reject(new Error('Canvas is empty'));
+			}, 'image/jpeg');
+		});
+	};
+
+	const handleCropSave = async () => {
+		if (!imageSrc || !croppedAreaPixels) return;
+		const croppedBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
+		const file = new File([croppedBlob], 'profile.jpg', {
+			type: 'image/jpeg'
+		});
+		const url = await uploadFile(
+			file,
+			`profile-images/${Date.now()}-profile.jpg`
+		);
+		setImageUrl(url);
+		setCroppedImage(URL.createObjectURL(croppedBlob));
+		setCropModalOpen(false);
+	};
+
 	return (
-		<form onSubmit={form.onSubmit(console.log)} className={classes.form}>
-			<TextInput
-				size='md'
-				mb={10}
-				label='Email'
-				placeholder='Your email'
-				error={form.errors.email}
-				withAsterisk
-				rightSection={
-					form.errors.email && (
-						<IconAlertTriangle
-							stroke={1.5}
-							size={18}
-							className={classes.icon}
+		<Paper radius='md' p='lg' withBorder className={classes.form_container}>
+			<Text size='lg' fw={500}>
+				Welcome to <strong>ProBlog</strong>, login with
+			</Text>
+			<Group grow mb='md' mt='md'>
+				<GoogleButton
+					radius='xl'
+					onClick={() => signIn('google', { callbackUrl: '/' })}
+				>
+					Google
+				</GoogleButton>
+			</Group>
+
+			<Divider
+				label='Or continue with email'
+				labelPosition='center'
+				my='lg'
+			/>
+			<form
+				onSubmit={e => {
+					e.preventDefault();
+					onSubmit({
+						email: form.values.email,
+						password: form.values.password,
+						...(type === 'register' && {
+							name: form.values.name,
+							image: imageUrl
+						})
+					});
+				}}
+				className={classes.form}
+			>
+				{type === 'register' && (
+					<>
+						<Group mb='md'>
+							<input
+								type='file'
+								accept='image/*'
+								ref={inputRef}
+								onChange={onSelectFile}
+								style={{ display: 'none' }}
+							/>
+							<Button
+								variant='outline'
+								onClick={() => inputRef.current?.click()}
+								style={{ marginRight: 16 }}
+							>
+								Choose Profile Image
+							</Button>
+							{croppedImage && (
+								<img
+									className={classes.profileImagePreview}
+									src={croppedImage}
+									alt='Profile'
+								/>
+							)}
+						</Group>
+						<Modal
+							opened={cropModalOpen}
+							onClose={() => setCropModalOpen(false)}
+							title='Crop your profile image'
+							centered
+							size='lg'
+						>
+							{imageSrc && (
+								<div
+									style={{
+										position: 'relative',
+										width: '100%',
+										height: 300
+									}}
+								>
+									<Cropper
+										image={imageSrc}
+										crop={crop}
+										zoom={zoom}
+										aspect={1}
+										onCropChange={setCrop}
+										onCropComplete={onCropComplete}
+										onZoomChange={setZoom}
+										cropShape='round'
+									/>
+								</div>
+							)}
+							<Group mt='md' className='right-0'>
+								<Button onClick={handleCropSave}>Save</Button>
+							</Group>
+						</Modal>
+
+						<TextInput
+							size='md'
+							mb={10}
+							label='Name'
+							placeholder='Your name'
+							error={form.errors.name}
+							withAsterisk
+							rightSection={
+								form.errors.name && (
+									<IconAlertTriangle
+										stroke={1.5}
+										size={18}
+										className={classes.icon}
+									/>
+								)
+							}
+							key={form.key('name')}
+							{...form.getInputProps('name')}
 						/>
-					)
-				}
-				{...form.getInputProps('email')}
-			/>
+					</>
+				)}
 
-			<PasswordInput
-				size='md'
-				placeholder='Your password'
-				label='Password'
-				withAsterisk
-				{...form.getInputProps('password')}
-			/>
+				<TextInput
+					size='md'
+					mb={10}
+					label='Email'
+					placeholder='Your email'
+					error={form.errors.email}
+					withAsterisk
+					rightSection={
+						form.errors.email && (
+							<IconAlertTriangle
+								stroke={1.5}
+								size={18}
+								className={classes.icon}
+							/>
+						)
+					}
+					key={form.key('email')}
+					{...form.getInputProps('email')}
+				/>
 
-			{type === 'register' && (
-				<>
-					<Group gap={5} grow mt='xs' mb='md'>
-						{bars}
-					</Group>
-
-					<PasswordRequirement
-						label='Has at least 6 characters'
-						meets={form.values.password.length > 5}
-					/>
-					{checks}
-				</>
-			)}
-
-			{type === 'register' && (
 				<PasswordInput
 					size='md'
-					mt='sm'
-					label='Confirm password'
-					placeholder='Confirm password'
+					placeholder='Your password'
+					label='Password'
 					withAsterisk
-					{...form.getInputProps('confirmPassword')}
+					key={form.key('password')}
+					{...form.getInputProps('password')}
 				/>
-			)}
 
-			<Button type='submit' mt='sm' fullWidth>
-				{type === 'login' ? 'Log in' : 'Sign up'}
-			</Button>
-		</form>
+				{type === 'register' && (
+					<>
+						<Group gap={5} grow mt='xs' mb='md'>
+							{bars}
+						</Group>
+
+						<PasswordRequirement
+							label='Has at least 6 characters'
+							meets={form.values.password.length > 5}
+						/>
+						{checks}
+					</>
+				)}
+
+				{type === 'register' && (
+					<PasswordInput
+						size='md'
+						mt='sm'
+						label='Confirm password'
+						placeholder='Confirm password'
+						withAsterisk
+						key={form.key('confirmPassword')}
+						{...form.getInputProps('confirmPassword')}
+					/>
+				)}
+
+				<Button type='submit' mt='md' fullWidth size='md'>
+					{type === 'login' ? 'Log in' : 'Sign up'}
+				</Button>
+			</form>
+		</Paper>
 	);
 }

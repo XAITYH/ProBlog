@@ -6,8 +6,9 @@ import {
 import { ActionIcon, Container, Group } from '@mantine/core';
 import classes from './footerSocial.module.css';
 import Link from 'next/link';
+import React from 'react';
 
-export function FooterSocial() {
+const FooterSocial = React.memo(() => {
 	return (
 		<div className={classes.footer}>
 			<Container className={classes.inner}>
@@ -37,4 +38,6 @@ export function FooterSocial() {
 			</Container>
 		</div>
 	);
-}
+});
+
+export default FooterSocial;

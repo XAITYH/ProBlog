@@ -1,0 +1,24 @@
+.card {
+	background-color: light-dark(
+		var(--mantine-color-white),
+		var(--mantine-color-dark-7)
+	);
+
+	min-width: 360px;
+	max-width: 400px;
+}
+
+.section {
+	border-bottom: 1px solid
+		light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+	padding-left: var(--mantine-spacing-md);
+	padding-right: var(--mantine-spacing-md);
+	padding-bottom: var(--mantine-spacing-md);
+}
+
+@media (max-width: $mantine-breakpoint-xs) {
+	.card {
+		min-width: 280px;
+		max-width: 300px;
+	}
+}

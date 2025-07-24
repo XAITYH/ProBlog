@@ -1,5 +1,6 @@
 import '@mantine/core/styles.css';
 import '@mantine/dropzone/styles.css';
+import '@mantine/carousel/styles.css';
 import { Notifications } from '@mantine/notifications';
 
 import {
@@ -12,8 +13,8 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import Header from '@/widgets/header/Header';
-import { Suspense } from 'react';
-import Loading from './Loading';
+import { Providers } from './providers';
+import SessionSync from '@/components/SessionSync';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -44,15 +45,18 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
-				<MantineProvider defaultColorScheme='dark'>
-					<Header />
-					<Notifications
-						position='top-center'
-						className='notification'
-					/>
+				<Providers>
+					<MantineProvider defaultColorScheme='dark'>
+						<Header />
+						<Notifications
+							position='top-center'
+							className='notification'
+						/>
+						<SessionSync />
 
-					<Suspense fallback={<Loading />}>{children}</Suspense>
-				</MantineProvider>
+						{children}
+					</MantineProvider>
+				</Providers>
 			</body>
 		</html>
 	);

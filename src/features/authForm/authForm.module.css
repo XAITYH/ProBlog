@@ -1,4 +1,12 @@
-.form {
-	margin: 0 auto;
+.form_container {
 	width: 50%;
+	margin: 0 auto;
+}
+
+.profileImagePreview {
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid #eee;
 }

@@ -7,47 +7,67 @@ import { Card, Image } from '@mantine/core';
 import { useState } from 'react';
 import Lightbox from 'yet-another-react-lightbox';
 import { Zoom } from 'yet-another-react-lightbox/plugins';
+import { Carousel } from '@mantine/carousel';
 
 const ImageSection = ({ post }: { post: PostType }) => {
 	const [opened, setOpened] = useState<number | null>(null);
+	const [lightboxIndex, setLightboxIndex] = useState(0);
+
+	const files = post.files || [];
+
+	const handleImageClick = (idx: number) => {
+		setLightboxIndex(idx);
+		setOpened(post.id);
+	};
 
 	return (
 		<>
 			<Card.Section>
-				<Image
-					alt={post.title}
-					key={post.id}
-					src={post.images ? post.images[0] : ''}
-					className={classes.image}
-					loading='lazy'
-					onClick={() => setOpened(post.id)}
-				/>
+				{files.length > 1 ? (
+					<Carousel
+						slideSize='100%'
+						withIndicators
+						className={classes.carousel}
+					>
+						{files.map((file, idx) => (
+							<Carousel.Slide key={file.url}>
+								<Image
+									alt={post.title}
+									src={file.url}
+									className={classes.image}
+									loading='lazy'
+									onClick={() => handleImageClick(idx)}
+								/>
+							</Carousel.Slide>
+						))}
+					</Carousel>
+				) : files.length === 1 ? (
+					<Image
+						alt={post.title}
+						key={post.id}
+						src={files[0].url}
+						className={classes.image}
+						loading='lazy'
+						onClick={() => handleImageClick(0)}
+					/>
+				) : null}
 			</Card.Section>
 
 			<Lightbox
 				open={post.id === opened}
+				index={lightboxIndex}
 				close={() => setOpened(null)}
 				plugins={[Zoom]}
-				slides={
-					post.images
-						? post.images.map(image => ({
-								src: image
-						  }))
-						: []
-				}
+				slides={files.map(file => ({ src: file.url }))}
 				controller={{
-					disableSwipeNavigation: post.images
-						? post.images.length < 2
-						: false
+					disableSwipeNavigation: files.length < 2
 				}}
 				render={
-					post.images
-						? post.images.length < 2
-							? {
-									buttonNext: () => null,
-									buttonPrev: () => null
-							  }
-							: {}
+					files.length < 2
+						? {
+								buttonNext: () => null,
+								buttonPrev: () => null
+						  }
 						: {}
 				}
 			/>

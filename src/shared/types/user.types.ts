@@ -1,8 +1,9 @@
 export type UserType = {
-	id: number | null;
-	name: string;
+	id?: string;
+	name?: string;
 	email: string;
-	image: string;
+	password?: string;
+	image?: string | null;
 	likedPosts?: number[];
-	postsInCollection?: number[];
+	collections?: number[];
 };

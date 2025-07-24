@@ -1,14 +1,8 @@
-import React from 'react';
+import { Stack } from '@mantine/core';
+import { TopicControlSkeleton } from '@/components/topicControlSkeleton/TopicControlSkeleton';
+import { BadgeCardSkeleton } from '@/components/cardSkeleton/BadgeCardSkeleton';
+import classes from './loading.module.css';
 
-import { Text } from '@mantine/core';
-import { IconLoader } from '@tabler/icons-react';
-
-const Loading = () => {
-	return (
-		<Text className='text-center'>
-			Loading... <IconLoader />
-		</Text>
-	);
-};
-
-export default Loading;
+export default function Loading() {
+	return <div className={classes.loader}></div>;
+}
