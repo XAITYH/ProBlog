@@ -3,11 +3,12 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(
 	_request: NextRequest,
-	{ params }: { params: { id: string } }
+	context: { params: Promise<{ id: string }> }
 ) {
+	const { id } = await context.params;
 	try {
 		const user = await prisma.user.findUnique({
-			where: { id: params.id },
+			where: { id },
 			select: {
 				id: true,
 				name: true,
@@ -41,10 +42,10 @@ export async function GET(
 
 export async function PUT(
 	request: NextRequest,
-	{ params }: { params: { id: string } }
+	context: { params: Promise<{ id: string }> }
 ) {
+	const { id } = await context.params;
 	try {
-		const { id } = params;
 		const { name, image } = await request.json();
 
 		const updatedUser = await prisma.user.update({
@@ -60,11 +61,10 @@ export async function PUT(
 
 export async function DELETE(
 	_request: NextRequest,
-	{ params }: { params: { id: string } }
+	context: { params: Promise<{ id: string }> }
 ) {
+	const { id } = await context.params;
 	try {
-		const { id } = params;
-
 		await prisma.user.delete({
 			where: { id }
 		});

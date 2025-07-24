@@ -5,15 +5,16 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
 	_request: NextRequest,
-	{ params }: { params: { id: string } }
+	context: { params: Promise<{ id: string }> }
 ) {
+	const { id } = await context.params;
 	const session = await getServerSession(authOptions);
-	if (!session?.user || session.user.id !== params.id) {
+	if (!session?.user || session.user.id !== id) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
 	const user = await prisma.user.findUnique({
-		where: { id: params.id },
+		where: { id },
 		select: {
 			likedPosts: { select: { postId: true } },
 			collections: { select: { postId: true } }

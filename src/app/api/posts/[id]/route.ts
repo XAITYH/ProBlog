@@ -5,12 +5,12 @@ import { prisma } from '@/lib/prisma';
 
 // GET - Fetch single post
 export async function GET(
-	request: NextRequest,
-	{ params }: { params: { id: string } }
+	_request: NextRequest,
+	context: { params: Promise<{ id: string }> }
 ) {
 	try {
 		const session = await getServerSession(authOptions);
-		const postId = Number(params.id);
+		const postId = Number(context.params);
 
 		if (isNaN(postId)) {
 			return NextResponse.json(
@@ -68,7 +68,7 @@ export async function GET(
 // PUT - Update a post
 export async function PUT(
 	request: NextRequest,
-	{ params }: { params: { id: string } }
+	context: { params: Promise<{ id: string }> }
 ) {
 	try {
 		const session = await getServerSession(authOptions);
@@ -79,7 +79,7 @@ export async function PUT(
 			);
 		}
 
-		const postId = Number(params.id);
+		const postId = Number(context.params);
 		if (isNaN(postId)) {
 			return NextResponse.json(
 				{ error: 'Invalid post ID' },
@@ -129,8 +129,8 @@ export async function PUT(
 
 // DELETE - Remove a post
 export async function DELETE(
-	request: NextRequest,
-	{ params }: { params: { id: string } }
+	_request: NextRequest,
+	context: { params: Promise<{ id: string }> }
 ) {
 	try {
 		const session = await getServerSession(authOptions);
@@ -141,7 +141,7 @@ export async function DELETE(
 			);
 		}
 
-		const postId = Number(params.id);
+		const postId = Number(context.params);
 		if (isNaN(postId)) {
 			return NextResponse.json(
 				{ error: 'Invalid post ID' },

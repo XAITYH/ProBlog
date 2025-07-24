@@ -3,11 +3,12 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(
 	_req: NextRequest,
-	{ params }: { params: { id: string } }
+	context: { params: Promise<{ id: string }> }
 ) {
+	const { id } = await context.params;
 	const posts = await prisma.post.findMany({
 		where: {
-			collections: { some: { userId: params.id } }
+			collections: { some: { userId: id } }
 		},
 		include: {
 			author: { select: { id: true, name: true, image: true } },
