@@ -116,7 +116,6 @@ const PostForm = ({ post }: PostFormType) => {
 		try {
 			let fileUrls = [...existingFiles];
 
-			// If there are new files, upload them and add their URLs
 			if (files.length > 0) {
 				const uploadedUrls = await uploadFiles(files);
 				fileUrls = [...fileUrls, ...uploadedUrls];
