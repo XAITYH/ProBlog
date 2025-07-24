@@ -15,6 +15,7 @@ import './globals.css';
 import Header from '@/widgets/header/Header';
 import { Providers } from './providers';
 import SessionSync from '@/components/SessionSync';
+import { Suspense } from 'react';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -54,7 +55,7 @@ export default function RootLayout({
 						/>
 						<SessionSync />
 
-						{children}
+						<Suspense>{children}</Suspense>
 					</MantineProvider>
 				</Providers>
 			</body>
