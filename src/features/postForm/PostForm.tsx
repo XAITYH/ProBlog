@@ -39,7 +39,6 @@ import { TopicVars } from '@/shared/constants/topics.constants';
 
 import Image from 'next/image';
 import { redirect, useSearchParams } from 'next/navigation';
-import { uploadFile } from '@/lib/blob.server';
 import { TopicTypes } from '@/shared/types/topics.types';
 
 type PostFormType = {
@@ -48,6 +47,7 @@ type PostFormType = {
 
 const PostForm = ({ post }: PostFormType) => {
 	const [files, setFiles] = useState<File[]>([]);
+	const [uploadingFiles, setUploadingFiles] = useState<string[]>([]);
 	const [previews, setPreviews] = useState<string[]>(
 		post?.files?.map(f => f.url) || []
 	);
@@ -105,9 +105,24 @@ const PostForm = ({ post }: PostFormType) => {
 	if (!session) redirect('/auth/login');
 
 	// Helper to upload new files and get URLs
+	async function uploadFileClient(file: File, path: string): Promise<string> {
+		const formData = new FormData();
+		formData.append('file', file);
+		formData.append('path', path);
+
+		const res = await fetch('/api/upload', {
+			method: 'POST',
+			body: formData
+		});
+		if (!res.ok) throw new Error('Failed to upload file');
+		const { url } = await res.json();
+		return url;
+	}
+
+	// Upload files to the server
 	async function uploadFiles(files: File[]): Promise<string[]> {
 		return await Promise.all(
-			files.map(file => uploadFile(file, file.name))
+			files.map(file => uploadFileClient(file, file.name))
 		);
 	}
 
