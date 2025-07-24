@@ -39,7 +39,7 @@ import { TopicVars } from '@/shared/constants/topics.constants';
 
 import Image from 'next/image';
 import { redirect, useSearchParams } from 'next/navigation';
-import { uploadFile } from '@/lib/blob';
+import { uploadFile } from '@/lib/blob.server';
 import { TopicTypes } from '@/shared/types/topics.types';
 
 type PostFormType = {

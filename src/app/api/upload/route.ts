@@ -1,30 +1,18 @@
+import { put } from '@vercel/blob';
 import { NextRequest, NextResponse } from 'next/server';
-import { handleUpload } from '@vercel/blob/client';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
-	const session = await getServerSession(authOptions);
-	if (!session?.user?.id) {
-		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-	}
-
 	try {
-		const body = (await req.json()) as Parameters<
-			typeof handleUpload
-		>[0]['body'];
+		const form = await req.formData();
+		const file = form.get('file') as File;
+		const path = form.get('path') as string;
 
-		const jsonResponse = await handleUpload({
-			body,
-			request: req,
-			onBeforeGenerateToken: async () => {
-				return { allowedContentTypes: ['image/*'], tokenPayload: '' };
-			},
-			onUploadCompleted: async () => {
-				return;
-			}
-		});
-		return NextResponse.json(jsonResponse);
+		if (!file || !path) {
+			return NextResponse.json({ error: 'Bad request' }, { status: 400 });
+		}
+
+		const blob = await put(path, file, { access: 'public' });
+		return NextResponse.json({ url: blob.url });
 	} catch (error) {
 		console.error('[UPLOAD_ERROR]', error);
 		return NextResponse.json(

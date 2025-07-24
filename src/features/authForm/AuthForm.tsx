@@ -21,7 +21,7 @@ import { AuthFormType } from '@/shared/types/authForm.types';
 import { signIn } from 'next-auth/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Cropper from 'react-easy-crop';
-import { uploadFile } from '@/lib/blob';
+import { notifications } from '@mantine/notifications';
 
 function PasswordRequirement({
 	meets,
@@ -208,28 +208,53 @@ export function AuthForm({ type, onSubmit }: AuthFormType) {
 	};
 
 	const handleCropSave = async () => {
-		if (!imageSrc || !croppedAreaPixels) return;
-		const croppedBlob = await getCroppedImg(
-			imageSrc,
-			croppedAreaPixels,
-			originalFileType
-		);
-		const newCroppedImage = URL.createObjectURL(croppedBlob);
-		const file = new File([croppedBlob], `profile.${originalFileExt}`, {
-			type: originalFileType
-		});
-		const url = await uploadFile(
-			file,
-			`profile-images/${Date.now()}-profile.${originalFileExt}`
-		);
+		try {
+			if (!imageSrc || !croppedAreaPixels) return;
+			const croppedBlob = await getCroppedImg(
+				imageSrc,
+				croppedAreaPixels,
+				originalFileType
+			);
+			const newCroppedImage = URL.createObjectURL(croppedBlob);
+			const file = new File([croppedBlob], `profile.${originalFileExt}`, {
+				type: originalFileType
+			});
 
-		if (croppedImage) {
-			URL.revokeObjectURL(croppedImage);
+			const formData = new FormData();
+			formData.append('file', file);
+			formData.append(
+				'path',
+				`profile-images/${Date.now()}-profile.${originalFileExt}`
+			);
+			const response = await fetch('/api/upload', {
+				method: 'POST',
+				body: formData
+			});
+			const data = await response.json();
+			const url = data.url;
+
+			if (croppedImage) {
+				URL.revokeObjectURL(croppedImage);
+			}
+
+			setCroppedImage(newCroppedImage);
+			setImageUrl(url);
+			setCropModalOpen(false);
+
+			notifications.show({
+				title: 'Success',
+				message: 'Image saved successfully',
+				color: 'green'
+			});
+		} catch (error) {
+			console.error(error);
+
+			notifications.show({
+				title: 'Error',
+				message: 'Failed to save image',
+				color: 'red'
+			});
 		}
-
-		setCroppedImage(newCroppedImage);
-		setImageUrl(url);
-		setCropModalOpen(false);
 	};
 
 	useEffect(() => {
@@ -291,11 +316,26 @@ export function AuthForm({ type, onSubmit }: AuthFormType) {
 								Choose Profile Image
 							</Button>
 							{croppedImage && (
-								<img
-									className={classes.profileImagePreview}
-									src={croppedImage}
-									alt='Profile'
-								/>
+								<>
+									<img
+										className={classes.profileImagePreview}
+										src={croppedImage}
+										alt='Profile'
+									/>
+									<Button
+										variant='subtle'
+										color='red'
+										size='xs'
+										onClick={() => {
+											setCroppedImage(null);
+											setImageUrl(null);
+											if (inputRef.current)
+												inputRef.current.value = '';
+										}}
+									>
+										Remove
+									</Button>
+								</>
 							)}
 						</Group>
 						<Modal
