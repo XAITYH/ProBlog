@@ -19,7 +19,7 @@ import classes from './authForm.module.css';
 import { GoogleButton } from './ui/GoogleButton';
 import { AuthFormType } from '@/shared/types/authForm.types';
 import { signIn } from 'next-auth/react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Cropper from 'react-easy-crop';
 import { uploadFile } from '@/lib/blob';
 
@@ -86,6 +86,9 @@ export function AuthForm({ type, onSubmit }: AuthFormType) {
 	const [imageUrl, setImageUrl] = useState<string | null>(null);
 	const [cropModalOpen, setCropModalOpen] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
+	const [originalFileType, setOriginalFileType] =
+		useState<string>('image/jpeg');
+	const [originalFileExt, setOriginalFileExt] = useState<string>('jpg');
 
 	const form = useForm<FormType>({
 		mode: 'controlled',
@@ -146,12 +149,15 @@ export function AuthForm({ type, onSubmit }: AuthFormType) {
 
 	const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files.length > 0) {
+			const file = e.target.files[0];
+			setOriginalFileType(file.type); // e.g., "image/png" or "image/jpeg"
+			setOriginalFileExt(file.type === 'image/png' ? 'png' : 'jpg');
 			const reader = new FileReader();
 			reader.addEventListener('load', () => {
 				setImageSrc(reader.result as string);
 				setCropModalOpen(true);
 			});
-			reader.readAsDataURL(e.target.files[0]);
+			reader.readAsDataURL(file);
 		}
 	};
 
@@ -172,7 +178,8 @@ export function AuthForm({ type, onSubmit }: AuthFormType) {
 
 	const getCroppedImg = async (
 		imageSrc: string,
-		crop: { x: number; y: number; width: number; height: number }
+		crop: { x: number; y: number; width: number; height: number },
+		type: string
 	) => {
 		const image = new window.Image();
 		image.src = imageSrc;
@@ -196,24 +203,42 @@ export function AuthForm({ type, onSubmit }: AuthFormType) {
 			canvas.toBlob(blob => {
 				if (blob) resolve(blob);
 				else reject(new Error('Canvas is empty'));
-			}, 'image/jpeg');
+			}, type);
 		});
 	};
 
 	const handleCropSave = async () => {
 		if (!imageSrc || !croppedAreaPixels) return;
-		const croppedBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
-		const file = new File([croppedBlob], 'profile.jpg', {
-			type: 'image/jpeg'
+		const croppedBlob = await getCroppedImg(
+			imageSrc,
+			croppedAreaPixels,
+			originalFileType
+		);
+		const newCroppedImage = URL.createObjectURL(croppedBlob);
+		const file = new File([croppedBlob], `profile.${originalFileExt}`, {
+			type: originalFileType
 		});
 		const url = await uploadFile(
 			file,
-			`profile-images/${Date.now()}-profile.jpg`
+			`profile-images/${Date.now()}-profile.${originalFileExt}`
 		);
+
+		if (croppedImage) {
+			URL.revokeObjectURL(croppedImage);
+		}
+
+		setCroppedImage(newCroppedImage);
 		setImageUrl(url);
-		setCroppedImage(URL.createObjectURL(croppedBlob));
 		setCropModalOpen(false);
 	};
+
+	useEffect(() => {
+		return () => {
+			if (croppedImage) {
+				URL.revokeObjectURL(croppedImage);
+			}
+		};
+	}, [croppedImage]);
 
 	return (
 		<Paper radius='md' p='lg' withBorder className={classes.form_container}>
