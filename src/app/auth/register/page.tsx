@@ -4,6 +4,7 @@ import Loader from '@/components/loader/Loader';
 import { AuthForm } from '@/features/authForm/AuthForm';
 import { UserType } from '@/shared/types/user.types';
 import { notifications } from '@mantine/notifications';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -34,7 +35,17 @@ const Register = () => {
 				autoClose: 2500
 			});
 
-			router.push('/auth/login?registered=true');
+			const signInRes = await signIn('credentials', {
+				email: userData.email,
+				password: userData.password,
+				redirect: false
+			});
+
+			if (signInRes?.error) {
+				throw new Error(signInRes.error);
+			} else {
+				router.push('/profile');
+			}
 		} catch (error) {
 			notifications.show({
 				title: 'Registration failed',

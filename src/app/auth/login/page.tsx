@@ -1,19 +1,13 @@
 'use client';
 
 import { AuthForm } from '@/features/authForm/AuthForm';
-import { useStore } from '@/lib/store';
 import { UserType } from '@/shared/types/user.types';
-import { Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { signIn } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import React from 'react';
+import { useRouter } from 'next/navigation';
 
 const Login = () => {
 	const router = useRouter();
-
-	const searchParams = useSearchParams();
-	const registered = searchParams.get('registered');
 
 	const handleSubmit = async (userData: UserType) => {
 		try {
@@ -47,12 +41,6 @@ const Login = () => {
 
 	return (
 		<div>
-			{registered && (
-				<Text c='green' className='text-center' mb='md'>
-					Registration successful! Please login.
-				</Text>
-			)}
-
 			<AuthForm
 				type='login'
 				onSubmit={(userData: UserType) => handleSubmit(userData)}
