@@ -49,6 +49,13 @@ const BadgeCard = React.memo(
 	}: BadgeCardTypes) => {
 		const router = useRouter();
 
+		// Debug logging for user image
+		console.log('BadgeCard Debug:', {
+			postId: post.id,
+			authorImage: post.author?.image,
+			authorName: post.author?.name
+		});
+
 		const handleLike = async () => {
 			if (!currentUser) {
 				router.push('/auth/login');

@@ -174,7 +174,12 @@ export async function DELETE(
 		}
 
 		await prisma.post.delete({
-			where: { id: postId }
+			where: { id: postId },
+			include: {
+				author: true,
+				likedBy: true,
+				collections: true
+			}
 		});
 
 		return NextResponse.json({ ok: true }, { status: 200 });

@@ -70,7 +70,12 @@ export async function DELETE(
 	const { id } = await context.params;
 	try {
 		await prisma.user.delete({
-			where: { id }
+			where: { id },
+			include: {
+				posts: true,
+				likedPosts: true,
+				collections: true
+			}
 		});
 
 		return NextResponse.json({ message: 'User deleted successfully' });
