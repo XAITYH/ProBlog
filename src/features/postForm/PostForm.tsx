@@ -161,17 +161,13 @@ const PostForm = ({ post }: PostFormType) => {
 			handleRemoveExistingFile(existingIndex);
 		} else {
 			// This is a new file
-			const newFileIndex = files.findIndex((_, i) => {
-				// Find the corresponding new file index
-				let newFileCount = 0;
-				for (let j = 0; j < index; j++) {
-					if (existingFiles.indexOf(previews[j]) === -1) {
-						newFileCount++;
-					}
-				}
-				return i === newFileCount;
-			});
-			handleRemoveNewFile(newFileIndex);
+			console.log('Removing new file');
+			const newFileIndex = index - existingFiles.length;
+			if (newFileIndex >= 0 && newFileIndex < files.length) {
+				handleRemoveNewFile(newFileIndex);
+			} else {
+				console.error('Invalid new file index:', newFileIndex);
+			}
 		}
 	};
 
@@ -284,10 +280,21 @@ const PostForm = ({ post }: PostFormType) => {
 					multiple
 					openRef={openRef}
 					onDrop={acceptedFiles => {
-						const newFiles = [...files, ...acceptedFiles].slice(
-							0,
-							5
-						);
+						// Check total files limit (existing + new)
+						const totalFiles =
+							existingFiles.length +
+							files.length +
+							acceptedFiles.length;
+						if (totalFiles > 5) {
+							notifications.show({
+								title: 'Too many files',
+								message: 'Maximum 5 files allowed',
+								color: 'red'
+							});
+							return;
+						}
+
+						const newFiles = [...files, ...acceptedFiles];
 						setFiles(newFiles);
 
 						// Create previews for new files
@@ -373,34 +380,24 @@ const PostForm = ({ post }: PostFormType) => {
 
 			{previews.length > 0 && (
 				<div className={classes.previews}>
-					{previews.map((preview, index) => {
-						console.log(`Preview ${index}:`, preview);
-						return (
-							<div key={index} className={classes.previewWrapper}>
-								<Image
-									src={preview}
-									alt={`Preview ${index + 1}`}
-									width={100}
-									height={100}
-									className={classes.previewImage}
-									onError={e => {
-										console.error(
-											`Failed to load image ${index}:`,
-											preview
-										);
-										e.currentTarget.style.display = 'none';
-									}}
-								/>
-								<button
-									type='button'
-									className={classes.removePreview}
-									onClick={() => handleRemoveFile(index)}
-								>
-									<IconX size={16} />
-								</button>
-							</div>
-						);
-					})}
+					{previews.map((preview, index) => (
+						<div key={index} className={classes.previewWrapper}>
+							<Image
+								src={preview}
+								alt={`Preview ${index + 1}`}
+								width={100}
+								height={100}
+								className={classes.previewImage}
+							/>
+							<button
+								type='button'
+								className={classes.removePreview}
+								onClick={() => handleRemoveFile(index)}
+							>
+								<IconX size={16} />
+							</button>
+						</div>
+					))}
 				</div>
 			)}
 
