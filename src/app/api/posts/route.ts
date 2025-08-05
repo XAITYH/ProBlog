@@ -19,7 +19,9 @@ export async function GET(request: NextRequest) {
 			skip: cursor ? 1 : 0,
 			cursor: cursor ? { id: Number(cursor) } : undefined,
 			include: {
-				author: { select: { id: true, name: true, email: true } },
+				author: {
+					select: { id: true, name: true, email: true, image: true }
+				},
 				files: true,
 				_count: { select: { likedBy: true, collections: true } }
 			}
@@ -85,7 +87,9 @@ export async function POST(request: NextRequest) {
 				}
 			},
 			include: {
-				author: { select: { id: true, name: true, email: true } },
+				author: {
+					select: { id: true, name: true, email: true, image: true }
+				},
 				files: true,
 				_count: { select: { likedBy: true, collections: true } }
 			}
