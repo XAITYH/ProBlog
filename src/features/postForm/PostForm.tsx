@@ -48,9 +48,9 @@ type PostFormType = {
 const PostForm = ({ post }: PostFormType) => {
 	const [files, setFiles] = useState<File[]>([]);
 	const [uploadingFiles, setUploadingFiles] = useState<string[]>([]);
-	const [previews, setPreviews] = useState<string[]>(
-		post?.files?.map(f => f.url) || []
-	);
+
+	const initialPreviews = post?.files?.map(f => f.url) || [];
+	const [previews, setPreviews] = useState<string[]>(initialPreviews);
 	const [existingFiles, setExistingFiles] = useState<string[]>(
 		post?.files?.map(f => f.url) || []
 	);
@@ -67,7 +67,7 @@ const PostForm = ({ post }: PostFormType) => {
 	const form = useForm({
 		mode: 'uncontrolled',
 		initialValues: {
-			images: post?.files?.map(f => f.url) || [],
+			images: initialPreviews,
 			title: post?.title || '',
 			description: post?.description || '',
 			topic: post?.topic || topicFromUrl
@@ -372,31 +372,35 @@ const PostForm = ({ post }: PostFormType) => {
 			)}
 
 			{previews.length > 0 && (
-				<div
-					className={
-						files.length > 5
-							? `${classes.previews} ${classes.previews_error}`
-							: `${classes.previews}`
-					}
-				>
-					{previews.map((preview, index) => (
-						<div key={index} className={classes.previewWrapper}>
-							<Image
-								src={preview}
-								alt={`Preview ${index + 1}`}
-								width={100}
-								height={100}
-								className={classes.previewImage}
-							/>
-							<button
-								type='button'
-								className={classes.removePreview}
-								onClick={() => handleRemoveFile(index)}
-							>
-								<IconX size={16} />
-							</button>
-						</div>
-					))}
+				<div className={classes.previews}>
+					{previews.map((preview, index) => {
+						console.log(`Preview ${index}:`, preview);
+						return (
+							<div key={index} className={classes.previewWrapper}>
+								<Image
+									src={preview}
+									alt={`Preview ${index + 1}`}
+									width={100}
+									height={100}
+									className={classes.previewImage}
+									onError={e => {
+										console.error(
+											`Failed to load image ${index}:`,
+											preview
+										);
+										e.currentTarget.style.display = 'none';
+									}}
+								/>
+								<button
+									type='button'
+									className={classes.removePreview}
+									onClick={() => handleRemoveFile(index)}
+								>
+									<IconX size={16} />
+								</button>
+							</div>
+						);
+					})}
 				</div>
 			)}
 
