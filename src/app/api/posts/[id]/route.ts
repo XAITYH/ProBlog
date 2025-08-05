@@ -10,7 +10,8 @@ export async function GET(
 ) {
 	try {
 		const session = await getServerSession(authOptions);
-		const postId = Number(context.params);
+		const { id } = await context.params;
+		const postId = Number(id);
 
 		if (isNaN(postId)) {
 			return NextResponse.json(
@@ -29,6 +30,7 @@ export async function GET(
 						email: true
 					}
 				},
+				files: true,
 				likedBy: session?.user?.id
 					? {
 							where: {
@@ -79,7 +81,8 @@ export async function PUT(
 			);
 		}
 
-		const postId = Number(context.params);
+		const { id } = await context.params;
+		const postId = Number(id);
 		if (isNaN(postId)) {
 			return NextResponse.json(
 				{ error: 'Invalid post ID' },
@@ -112,8 +115,16 @@ export async function PUT(
 				description,
 				topic,
 				files: {
-					set: [...(body.files || [])]
+					deleteMany: {},
+					create: (body.files || []).map((file: any) => ({
+						url: typeof file === 'string' ? file : file.url
+					}))
 				}
+			},
+			include: {
+				author: { select: { id: true, name: true, email: true } },
+				files: true,
+				_count: { select: { likedBy: true, collections: true } }
 			}
 		});
 
@@ -141,7 +152,8 @@ export async function DELETE(
 			);
 		}
 
-		const postId = Number(context.params);
+		const { id } = await context.params;
+		const postId = Number(id);
 		if (isNaN(postId)) {
 			return NextResponse.json(
 				{ error: 'Invalid post ID' },

@@ -6,7 +6,7 @@ export type PostType = {
 	topic: Omit<TopicTypes, 'all'>;
 	files?: {
 		url: string;
-		fileName: string;
+		id?: number;
 	}[];
 	title: string;
 	extra?: string;

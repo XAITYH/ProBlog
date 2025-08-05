@@ -52,7 +52,11 @@ export async function POST(request: NextRequest) {
 		const title = body.get('title') as string;
 		const description = body.get('description') as string;
 		const topic = body.get('topic') as string;
-		const files = body.getAll('files') as string[]; // Expecting file URLs
+
+		// Handle both 'files' and 'fileUrls' for backward compatibility
+		const files = body.getAll('files') as string[];
+		const fileUrls = body.getAll('fileUrls') as string[];
+		const allFileUrls = [...files, ...fileUrls];
 
 		if (!title || !description || !topic) {
 			return NextResponse.json(
@@ -61,7 +65,7 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		if (files.length > 5) {
+		if (allFileUrls.length > 5) {
 			return NextResponse.json(
 				{ error: 'Max 5 files allowed' },
 				{ status: 400 }
@@ -75,7 +79,9 @@ export async function POST(request: NextRequest) {
 				topic,
 				authorId: session.user.id,
 				files: {
-					create: files.map(url => ({ url }))
+					create: allFileUrls.map(url => ({
+						url
+					}))
 				}
 			},
 			include: {

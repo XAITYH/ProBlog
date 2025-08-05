@@ -143,8 +143,7 @@ const PostForm = ({ post }: PostFormType) => {
 					description: values.description,
 					topic: values.topic,
 					files: fileUrls.map(url => ({
-						url,
-						fileName: url.split('/').pop() || ''
+						url
 					}))
 				});
 				notifications.show({
