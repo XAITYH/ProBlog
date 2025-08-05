@@ -90,7 +90,7 @@ model File {
   id  Int    @id @default(autoincrement())
   url String
 
-  post   Post @relation(fields: [postId], references: [id])
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId Int  @map("post_id")
 
   @@map("file")
