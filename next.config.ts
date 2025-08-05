@@ -7,6 +7,16 @@ const nextConfig: NextConfig = {
 	reactStrictMode: true,
 	experimental: {
 		serverComponentsExternalPackages: ['@vercel/blob']
+	},
+	images: {
+		remotePatterns: [
+			{
+				protocol: 'https',
+				hostname: '*.public.blob.vercel-storage.com',
+				port: '',
+				pathname: '/**'
+			}
+		]
 	}
 };
 
