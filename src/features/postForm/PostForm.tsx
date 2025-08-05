@@ -126,6 +126,55 @@ const PostForm = ({ post }: PostFormType) => {
 		);
 	}
 
+	// Handle removing existing files
+	const handleRemoveExistingFile = (index: number) => {
+		const updatedExistingFiles = [...existingFiles];
+		updatedExistingFiles.splice(index, 1);
+		setExistingFiles(updatedExistingFiles);
+
+		// Update previews to reflect the removal
+		const updatedPreviews = [...previews];
+		updatedPreviews.splice(index, 1);
+		setPreviews(updatedPreviews);
+		form.setFieldValue('images', updatedPreviews);
+	};
+
+	// Handle removing new files
+	const handleRemoveNewFile = (index: number) => {
+		URL.revokeObjectURL(previews[index]);
+		const updatedPreviews = [...previews];
+		const updatedFiles = [...files];
+		updatedPreviews.splice(index, 1);
+		updatedFiles.splice(index, 1);
+		setPreviews(updatedPreviews);
+		setFiles(updatedFiles);
+		form.setFieldValue('images', updatedPreviews);
+	};
+
+	// Handle removing any file by checking if it's in existingFiles
+	const handleRemoveFile = (index: number) => {
+		const fileUrl = previews[index];
+		const existingIndex = existingFiles.indexOf(fileUrl);
+
+		if (existingIndex !== -1) {
+			// This is an existing file
+			handleRemoveExistingFile(existingIndex);
+		} else {
+			// This is a new file
+			const newFileIndex = files.findIndex((_, i) => {
+				// Find the corresponding new file index
+				let newFileCount = 0;
+				for (let j = 0; j < index; j++) {
+					if (existingFiles.indexOf(previews[j]) === -1) {
+						newFileCount++;
+					}
+				}
+				return i === newFileCount;
+			});
+			handleRemoveNewFile(newFileIndex);
+		}
+	};
+
 	async function handleSubmit(values: any) {
 		setIsUploading(true);
 		try {
@@ -241,12 +290,16 @@ const PostForm = ({ post }: PostFormType) => {
 						);
 						setFiles(newFiles);
 
-						const newPreviews = newFiles.map(file =>
+						// Create previews for new files
+						const newFilePreviews = acceptedFiles.map(file =>
 							URL.createObjectURL(file)
 						);
-						setPreviews(newPreviews);
 
-						form.setFieldValue('images', newPreviews);
+						// Combine existing previews with new ones
+						const allPreviews = [...previews, ...newFilePreviews];
+						setPreviews(allPreviews);
+
+						form.setFieldValue('images', allPreviews);
 					}}
 					onReject={() => {
 						notifications.show({
@@ -338,19 +391,7 @@ const PostForm = ({ post }: PostFormType) => {
 							<button
 								type='button'
 								className={classes.removePreview}
-								onClick={() => {
-									URL.revokeObjectURL(previews[index]);
-									const updatedPreviews = [...previews];
-									const updatedFiles = [...files];
-									updatedPreviews.splice(index, 1);
-									updatedFiles.splice(index, 1);
-									setPreviews(updatedPreviews);
-									setFiles(updatedFiles);
-									form.setFieldValue(
-										'images',
-										updatedPreviews
-									);
-								}}
+								onClick={() => handleRemoveFile(index)}
 							>
 								<IconX size={16} />
 							</button>
