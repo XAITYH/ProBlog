@@ -2,7 +2,6 @@ import { PostType } from '@/shared/types/post.types';
 import { UserType } from '@/shared/types/user.types';
 import { create } from 'zustand';
 import { TopicTypes } from '@/shared/types/topics.types';
-import { signIn } from 'next-auth/react';
 
 type Store = {
 	currentUser: UserType | null;

@@ -5,7 +5,7 @@ import { useStore } from '@/lib/store';
 import { useShallow } from 'zustand/react/shallow';
 import { TopicTypes } from '@/shared/types/topics.types';
 import BadgeCard from '../card/BadgeCard';
-import { Group, Text } from '@mantine/core';
+import { Text } from '@mantine/core';
 import { BadgeCardSkeleton } from '../cardSkeleton/BadgeCardSkeleton';
 
 const CardsList = ({ currentTopic }: { currentTopic: TopicTypes }) => {

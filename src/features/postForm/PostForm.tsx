@@ -161,7 +161,11 @@ const PostForm = ({ post }: PostFormType) => {
 				formData.append('title', values.title);
 				formData.append('description', values.description);
 				formData.append('topic', String(values.topic));
-				files.forEach(file => formData.append('files', file));
+
+				fileUrls.forEach(url => {
+					formData.append('fileUrls', url);
+				});
+
 				await createPost(formData);
 				notifications.show({
 					title: 'Success!',
@@ -416,7 +420,13 @@ const PostForm = ({ post }: PostFormType) => {
 				{...form.getInputProps('topic')}
 			/>
 
-			<Button type='submit' mt='sm' fullWidth loading={isUploading}>
+			<Button
+				type='submit'
+				mt='sm'
+				mb='md'
+				fullWidth
+				loading={isUploading}
+			>
 				{post ? 'Update Post' : 'Post'}
 			</Button>
 			{post && (

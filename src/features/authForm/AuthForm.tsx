@@ -90,6 +90,7 @@ export function AuthForm({ type, onSubmit }: AuthFormType) {
 		useState<string>('image/jpeg');
 	const [originalFileExt, setOriginalFileExt] = useState<string>('jpg');
 	const [isLoading, setIsLoading] = useState(false);
+
 	const form = useForm<FormType>({
 		mode: 'controlled',
 		initialValues: {
@@ -99,7 +100,8 @@ export function AuthForm({ type, onSubmit }: AuthFormType) {
 			confirmPassword: ''
 		},
 		validate: {
-			email: value => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+			email: value =>
+				/^\S+@\S+\.\S+$/.test(value) ? null : 'Invalid email',
 			password: value => {
 				if (type === 'register') {
 					if (value.length < 6)
@@ -227,10 +229,17 @@ export function AuthForm({ type, onSubmit }: AuthFormType) {
 				'path',
 				`profile-images/${Date.now()}-profile.${originalFileExt}`
 			);
+
 			const response = await fetch('/api/upload', {
 				method: 'POST',
 				body: formData
 			});
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.error || 'Upload failed');
+			}
+
 			const data = await response.json();
 			const url = data.url;
 
@@ -248,11 +257,14 @@ export function AuthForm({ type, onSubmit }: AuthFormType) {
 				color: 'green'
 			});
 		} catch (error) {
-			console.error(error);
+			console.error('Upload error:', error);
 
 			notifications.show({
 				title: 'Error',
-				message: 'Failed to save image',
+				message:
+					error instanceof Error
+						? error.message
+						: 'Failed to save image',
 				color: 'red'
 			});
 		} finally {
